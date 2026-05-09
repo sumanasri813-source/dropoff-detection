@@ -9,19 +9,44 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v4
+
     - name: Set up Python 3.11
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: "3.11"
-    - name: Install dependencies
+
+    - name: Cache pip packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install core dependencies for testing
       run: |
         python -m pip install --upgrade pip
-        pip install pytest pytest-cov
-        pip install -r requirements.txt
+        # Install only what is needed for the API and tests (fast install)
+        pip install flask sqlalchemy pytest pytest-cov pyyaml \
+                    python-dotenv structlog jsonschema flasgger \
+                    flask-caching flask-limiter requests scikit-learn \
+                    pandas numpy joblib
+
     - name: Run Tests with Coverage
       run: |
-        pytest tests/ --cov=src --cov-report=xml
+        pytest tests/ --cov=src --cov-report=xml -v
       env:
         DATABASE_URL: "sqlite:///test.db"
+        API_KEY: "dropoff_demo_key_2024"
+        DROPOFF_REQUIRE_AUTH: "false"
+
+    - name: Upload Coverage Report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: coverage-report
+        path: coverage.xml
