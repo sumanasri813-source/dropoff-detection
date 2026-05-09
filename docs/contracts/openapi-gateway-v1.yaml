@@ -1,0 +1,290 @@
+openapi: 3.0.3
+info:
+  title: User Drop-Off Gateway API
+  version: 1.0.0
+  description: Public API contract for drop-off risk prediction.
+servers:
+  - url: https://api.example.com
+    description: Production
+  - url: http://localhost:8080
+    description: Local gateway
+
+tags:
+  - name: Prediction
+    description: Drop-off scoring endpoints
+
+paths:
+  /v1/dropoff/predict:
+    post:
+      tags:
+        - Prediction
+      operationId: predictDropoffRisk
+      summary: Predict user drop-off risk
+      description: Accepts normalized user/session/features payload and returns risk score and label.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PublicPredictRequest'
+            example:
+              request_id: f3b1c8a2-8c8b-4f5f-b35c-1c0a0c0f9b12
+              user:
+                user_id: U12345
+                segment: free
+                region: north
+              session:
+                session_id: S998877
+                timestamp_utc: 2026-04-08T10:30:00Z
+                device_type: mobile
+                os_type: android
+              features:
+                days_signup_age: 250
+                recency_days: 45
+                frequency_total: 9
+                session_duration_avg: 6.5
+                feature_count_used: 2
+              context:
+                source: web_app
+                model_hint: latest
+      responses:
+        '200':
+          description: Prediction completed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicPredictSuccessResponse'
+        '400':
+          description: Malformed request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicPredictErrorResponse'
+        '401':
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicPredictErrorResponse'
+        '422':
+          description: Validation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicPredictErrorResponse'
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicPredictErrorResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    PublicPredictRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - request_id
+        - user
+        - session
+        - features
+      properties:
+        request_id:
+          type: string
+          format: uuid
+        user:
+          type: object
+          additionalProperties: false
+          required:
+            - user_id
+            - segment
+            - region
+          properties:
+            user_id:
+              type: string
+              minLength: 1
+            segment:
+              type: string
+              enum: [free, trial, premium]
+            region:
+              type: string
+              enum: [north, south, east, west]
+        session:
+          type: object
+          additionalProperties: false
+          required:
+            - session_id
+            - timestamp_utc
+            - device_type
+            - os_type
+          properties:
+            session_id:
+              type: string
+              minLength: 1
+            timestamp_utc:
+              type: string
+              format: date-time
+            device_type:
+              type: string
+              enum: [mobile, desktop, tablet]
+            os_type:
+              type: string
+              enum: [android, ios, windows, mac, linux]
+        features:
+          type: object
+          additionalProperties: false
+          required:
+            - days_signup_age
+            - recency_days
+            - frequency_total
+            - session_duration_avg
+            - feature_count_used
+          properties:
+            days_signup_age:
+              type: number
+              minimum: 0
+            recency_days:
+              type: number
+              minimum: 0
+            frequency_total:
+              type: number
+              minimum: 0
+            session_duration_avg:
+              type: number
+              minimum: 0
+            feature_count_used:
+              type: number
+              minimum: 0
+        context:
+          type: object
+          additionalProperties: false
+          properties:
+            source:
+              type: string
+            model_hint:
+              type: string
+
+    PublicPredictSuccessResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - request_id
+        - prediction
+        - model
+        - meta
+      properties:
+        request_id:
+          type: string
+          format: uuid
+        prediction:
+          type: object
+          additionalProperties: false
+          required:
+            - dropoff_probability
+            - risk_label
+            - predicted_label
+            - threshold_used
+          properties:
+            dropoff_probability:
+              type: number
+              minimum: 0
+              maximum: 1
+            risk_label:
+              type: string
+              enum: [low, medium, high]
+            predicted_label:
+              type: integer
+              enum: [0, 1]
+            threshold_used:
+              type: number
+              minimum: 0
+              maximum: 1
+            top_reasons:
+              type: array
+              items:
+                $ref: '#/components/schemas/TopReason'
+        model:
+          type: object
+          additionalProperties: false
+          required:
+            - model_name
+            - model_version
+          properties:
+            model_name:
+              type: string
+            model_version:
+              type: string
+        meta:
+          type: object
+          additionalProperties: false
+          required:
+            - inference_timestamp_utc
+            - latency_ms
+          properties:
+            inference_timestamp_utc:
+              type: string
+              format: date-time
+            latency_ms:
+              type: integer
+              minimum: 0
+
+    PublicPredictErrorResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - request_id
+        - error
+      properties:
+        request_id:
+          type: string
+          format: uuid
+        error:
+          type: object
+          additionalProperties: false
+          required:
+            - code
+            - message
+          properties:
+            code:
+              type: string
+              enum:
+                - VALIDATION_ERROR
+                - UNAUTHORIZED
+                - UPSTREAM_ERROR
+                - INTERNAL_ERROR
+            message:
+              type: string
+            details:
+              type: array
+              items:
+                type: object
+                additionalProperties: false
+                required:
+                  - field
+                  - issue
+                properties:
+                  field:
+                    type: string
+                  issue:
+                    type: string
+
+    TopReason:
+      type: object
+      additionalProperties: false
+      required:
+        - feature
+        - impact
+      properties:
+        feature:
+          type: string
+        impact:
+          type: number

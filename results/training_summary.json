@@ -1,0 +1,11 @@
+{
+  "best_model": "logistic_regression",
+  "best_roc_auc": 0.9737755285303776,
+  "trained_model_paths": {
+    "logistic_regression": "models\\logistic_regression.pkl",
+    "random_forest": "models\\random_forest.pkl"
+  },
+  "best_model_path": "models\\best_model.pkl",
+  "final_model_path": "models\\final_model.pkl",
+  "comparison_path": "results\\model_comparison.csv"
+}

@@ -1,0 +1,25 @@
+{
+  "request_id": "f3b1c8a2-8c8b-4f5f-b35c-1c0a0c0f9b12",
+  "user": {
+    "user_id": "U12345",
+    "segment": "free",
+    "region": "north"
+  },
+  "session": {
+    "session_id": "S998877",
+    "timestamp_utc": "2026-04-08T10:30:00Z",
+    "device_type": "mobile",
+    "os_type": "android"
+  },
+  "features": {
+    "days_signup_age": 250,
+    "recency_days": 45,
+    "frequency_total": 9,
+    "session_duration_avg": 6.5,
+    "feature_count_used": 2
+  },
+  "context": {
+    "source": "web_app",
+    "model_hint": "latest"
+  }
+}

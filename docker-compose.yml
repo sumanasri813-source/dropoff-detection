@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    container_name: dropoff_api
+    ports:
+      - "5000:5000"
+    environment:
+      - API_KEY=dev-local-key
+      - FLASK_ENV=production
+    command: python -m src.api.app
+    volumes:
+      - ./models:/app/models
+      - ./data:/app/data
+      - ./results:/app/results
+
+  dashboard:
+    build: .
+    container_name: dropoff_dashboard
+    ports:
+      - "8502:8502"
+    environment:
+      - API_KEY=dev-local-key
+    command: python -m streamlit run streamlit_dashboard.py --server.port 8502 --server.address 0.0.0.0 --client.showErrorDetails=false
+    depends_on:
+      - api
+    volumes:
+      - ./models:/app/models
+      - ./data:/app/data
+      - ./results:/app/results

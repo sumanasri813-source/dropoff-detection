@@ -1,0 +1,64 @@
+{
+	"info": {
+		"name": "Premium User Drop-Off API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Health Check",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-API-Key",
+						"value": "dropoff_demo_key_2024",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/health",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"health"
+					]
+				}
+			}
+		},
+		{
+			"name": "Predict Drop-Off",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "X-API-Key",
+						"value": "dropoff_demo_key_2024",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"days_signup_age\": 45,\n    \"recency_days\": 5,\n    \"frequency_total\": 15,\n    \"session_duration_avg\": 12.5,\n    \"feature_count_used\": 4,\n    \"device_type\": \"Mobile\",\n    \"os_type\": \"iOS\",\n    \"user_segment\": \"Trial\",\n    \"region\": \"North\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:5000/predict",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"predict"
+					]
+				}
+			}
+		}
+	]
+}

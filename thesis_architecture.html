@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thesis Architecture Diagram</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #ffffff;
+            color: #333;
+            margin: 0;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            text-align: center;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        p {
+            color: #7f8c8d;
+            margin-bottom: 40px;
+        }
+        .diagram-box {
+            background-color: #f9fbff;
+            border: 1px solid #e0e6ed;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            margin-bottom: 40px;
+        }
+        .print-btn {
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .print-btn:hover {
+            background-color: #2563eb;
+        }
+        @media print {
+            .print-btn, p, h1 {
+                display: none;
+            }
+            .diagram-box {
+                box-shadow: none;
+                border: none;
+                background-color: white;
+                padding: 0;
+            }
+            @page {
+                size: landscape;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'default',
+            securityLevel: 'loose',
+            flowchart: {
+                useMaxWidth: false,
+                htmlLabels: true,
+                curve: 'basis'
+            }
+        });
+    </script>
+</head>
+<body>
+
+<div class="container">
+    <h1>System Architecture Workflow</h1>
+    <p>Print to PDF or take a screenshot of the diagram below for your thesis document.</p>
+
+    <div class="diagram-box">
+        <div class="mermaid">
+            %%{init: {'themeVariables': { 'primaryColor': '#e0f2fe', 'primaryBorderColor': '#0284c7', 'lineColor': '#475569', 'fontFamily': 'arial'}}}%%
+            graph TD
+                subgraph "1. Client Layer"
+                    A[Web Tracker / Client App]
+                    B[Streamlit Dashboard]
+                end
+
+                subgraph "2. API & Application Layer"
+                    C((Flask API REST Server))
+                    D[Alerting Background Service]
+                end
+
+                subgraph "3. Machine Learning Layer"
+                    E{Feature Engine & Preprocessor}
+                    F[(Logistic Regression Model)]
+                end
+
+                subgraph "4. Data Layer"
+                    G[(SQLite Database)]
+                end
+
+                A -- "Sends User Behavior (JSON)" --> C
+                B -- "Requests Predictions" --> C
+                
+                C -- "Extracts & Scales" --> E
+                E -- "Feeds Features" --> F
+                F -- "Returns Probability %" --> C
+                
+                C -- "Logs Result" --> G
+                C -- "Returns JSON" --> B
+                
+                D -- "Polls every 60s" --> C
+                D -- "Risk > 75%" --> H[Slack / Email Alert]
+
+                classDef default fill:#f8fafc,stroke:#94a3b8,stroke-width:2px;
+                classDef server fill:#e0e7ff,stroke:#4f46e5,stroke-width:2px;
+                classDef model fill:#dcfce7,stroke:#16a34a,stroke-width:2px;
+                classDef db fill:#fef3c7,stroke:#d97706,stroke-width:2px;
+
+                class C,D server;
+                class E,F model;
+                class G db;
+        </div>
+    </div>
+
+    <button class="print-btn" onclick="window.print()">Export as PDF for Thesis</button>
+</div>
+
+</body>
+</html>

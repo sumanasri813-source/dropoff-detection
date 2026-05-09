@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Thesis Diagram: Alerting System</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; text-align: center; padding: 40px; }
+        .diagram-box { background: #f9fbff; border: 1px solid #e0e6ed; padding: 40px; margin: 20px auto; max-width: 900px; }
+        .print-btn { background: #3b82f6; color: white; padding: 12px 24px; border: none; cursor: pointer; border-radius: 6px; }
+        @media print { .print-btn, h2, p { display: none; } .diagram-box { border: none; background: white; } }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({ startOnLoad: true, theme: 'default' });</script>
+</head>
+<body>
+    <h2>3. Automated Alerting Workflow</h2>
+    <p>The background service polling and triggering notifications.</p>
+    <div class="diagram-box">
+        <div class="mermaid">
+            graph TD
+                A[Alerting Background Job] -->|HTTP GET every 60s| B(Flask API /predictions)
+                B -->|Return latest prediction logs| C{Risk Score > 75%?}
+                
+                C -- Yes --> D[Extract User ID & Factors]
+                D --> E[Construct Alert Payload]
+                E --> F[Trigger Slack/Email Webhook]
+                
+                C -- No --> G[Wait 60s & Retry]
+                F --> G
+                
+                classDef default fill:#f8fafc,stroke:#94a3b8,stroke-width:2px;
+                classDef alert fill:#fee2e2,stroke:#ef4444,stroke-width:2px;
+                class F alert;
+        </div>
+    </div>
+    <button class="print-btn" onclick="window.print()">Export Alerting PDF</button>
+</body>
+</html>

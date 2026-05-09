@@ -1,0 +1,36 @@
+{
+  "timestamp": "2026-04-12T06:53:15.984356+00:00",
+  "snapshot": {
+    "events_total": 5,
+    "counters": {
+      "api_requests_total": 6,
+      "api_requests_GET_/users": 2,
+      "api_status_4xx": 3,
+      "api_status_2xx": 2,
+      "api_requests_GET_/monitor": 2,
+      "api_requests_POST_/monitor/persist": 2
+    },
+    "latency": {
+      "count": 5,
+      "avg_ms": 6611.688420000428,
+      "p95_ms": 26289.118760000558
+    },
+    "drift_stub": {
+      "status": "insufficient_data",
+      "baseline_mean": 0.5,
+      "current_mean": null,
+      "distance": null,
+      "samples": 0
+    }
+  },
+  "summary": {
+    "total_events": 5,
+    "event_types": {
+      "latency": 5
+    },
+    "modules": {
+      "api": 5
+    },
+    "duration_seconds": 2.6071210000000002
+  }
+}

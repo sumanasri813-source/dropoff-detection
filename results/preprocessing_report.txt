@@ -1,0 +1,6 @@
+Preprocessing Report
+==============================
+Input rows: 8000
+Output rows: 8000
+Duplicates removed: 0
+Rows dropped (remaining nulls): 0

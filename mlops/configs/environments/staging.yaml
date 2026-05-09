@@ -1,0 +1,36 @@
+environment: staging
+
+app:
+  debug: false
+  api_host: 0.0.0.0
+  api_port: 5000
+
+data:
+  use_sample_data: false
+  sample_size: null
+
+training:
+  run_xgboost: true
+  random_seed: 42
+
+monitoring:
+  enable_metrics: true
+  enable_drift_checks: true
+  log_level: INFO
+  monitor_worker_interval_sec: 60
+  alert_throttle_minutes: 10
+
+database:
+  type: postgresql
+  host: localhost
+  port: 5432
+  user: staging_user
+  password: staging_password
+  database: dropoff_detection_staging
+  url: ""
+  echo: false
+
+security:
+  require_auth: true
+  api_key: ""
+  api_key_env_var: API_KEY

@@ -1,0 +1,14 @@
+quality_gates:
+  evaluation:
+    roc_auc_min: 0.75
+    f1_min: 0.50
+    precision_min: 0.50
+    recall_min: 0.50
+
+  data_quality:
+    max_missing_ratio: 0.05
+    max_duplicate_ratio: 0.02
+
+  service:
+    max_prediction_latency_ms: 300
+    min_health_status: "healthy"

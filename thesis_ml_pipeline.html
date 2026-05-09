@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Thesis Diagram: ML Pipeline</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; text-align: center; padding: 40px; }
+        .diagram-box { background: #f9fbff; border: 1px solid #e0e6ed; padding: 40px; margin: 20px auto; max-width: 900px; }
+        .print-btn { background: #3b82f6; color: white; padding: 12px 24px; border: none; cursor: pointer; border-radius: 6px; }
+        @media print { .print-btn, h2, p { display: none; } .diagram-box { border: none; background: white; } }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({ startOnLoad: true, theme: 'default' });</script>
+</head>
+<body>
+    <h2>1. MLOps Pipeline Workflow</h2>
+    <p>Data generation, feature engineering, and model training.</p>
+    <div class="diagram-box">
+        <div class="mermaid">
+            graph LR
+                A[Synthetic Data Generator] -->|user_data.csv| B(Feature Preprocessor)
+                B -->|Scaling & Encoding| C{Feature Engine}
+                C -->|Extract Behaviors| D[Training Data Set]
+                D --> E(Logistic Regression / XGBoost)
+                E -->|Evaluate| F{Evaluator}
+                F -->|ROC-AUC Metrics| G[(final_model.pkl)]
+                
+                classDef default fill:#f8fafc,stroke:#94a3b8,stroke-width:2px;
+                classDef model fill:#dcfce7,stroke:#16a34a,stroke-width:2px;
+                class E,F,G model;
+        </div>
+    </div>
+    <button class="print-btn" onclick="window.print()">Export ML Pipeline PDF</button>
+</body>
+</html>

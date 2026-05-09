@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/internal-model-service-contract-v1.schema.json",
+  "title": "Internal Model Service Contract V1",
+  "description": "Internal API contract between production gateway and Python model service.",
+  "type": "object",
+  "oneOf": [
+    { "$ref": "#/$defs/InternalPredictRequest" },
+    { "$ref": "#/$defs/InternalPredictSuccessResponse" },
+    { "$ref": "#/$defs/InternalPredictErrorResponse" }
+  ],
+  "$defs": {
+    "InternalPredictRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["request_id", "feature_payload"],
+      "properties": {
+        "request_id": { "type": "string", "format": "uuid" },
+        "feature_payload": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "days_signup_age",
+            "recency_days",
+            "frequency_total",
+            "session_duration_avg",
+            "feature_count_used",
+            "device_type",
+            "os_type",
+            "user_segment",
+            "region"
+          ],
+          "properties": {
+            "days_signup_age": { "type": "number", "minimum": 0 },
+            "recency_days": { "type": "number", "minimum": 0 },
+            "frequency_total": { "type": "number", "minimum": 0 },
+            "session_duration_avg": { "type": "number", "minimum": 0 },
+            "feature_count_used": { "type": "number", "minimum": 0 },
+            "device_type": { "type": "string", "enum": ["mobile", "desktop", "tablet"] },
+            "os_type": { "type": "string", "enum": ["android", "ios", "windows", "mac", "linux"] },
+            "user_segment": { "type": "string", "enum": ["free", "trial", "premium"] },
+            "region": { "type": "string", "enum": ["north", "south", "east", "west"] }
+          }
+        },
+        "options": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "return_explanations": { "type": "boolean" }
+          }
+        }
+      }
+    },
+    "TopReason": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["feature", "impact"],
+      "properties": {
+        "feature": { "type": "string" },
+        "impact": { "type": "number" }
+      }
+    },
+    "InternalPredictSuccessResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "request_id",
+        "dropoff_probability",
+        "predicted_label",
+        "risk_level",
+        "threshold_used",
+        "model_version",
+        "inference_timestamp_utc"
+      ],
+      "properties": {
+        "request_id": { "type": "string", "format": "uuid" },
+        "dropoff_probability": { "type": "number", "minimum": 0, "maximum": 1 },
+        "predicted_label": { "type": "integer", "enum": [0, 1] },
+        "risk_level": { "type": "string", "enum": ["low", "medium", "high"] },
+        "threshold_used": { "type": "number", "minimum": 0, "maximum": 1 },
+        "top_reasons": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/TopReason" }
+        },
+        "model_version": { "type": "string" },
+        "inference_timestamp_utc": { "type": "string", "format": "date-time" }
+      }
+    },
+    "InternalPredictErrorResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["request_id", "error"],
+      "properties": {
+        "request_id": { "type": "string", "format": "uuid" },
+        "error": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

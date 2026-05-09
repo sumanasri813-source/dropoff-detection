@@ -1,0 +1,39 @@
+Model Training Summary
+=============================================
+Best model: logistic_regression
+Best ROC-AUC: 0.9738
+
+logistic_regression
+------------------------------
+ROC-AUC : 0.9738
+Precision: 0.8881
+Recall   : 0.9092
+F1       : 0.8985
+
+              precision    recall  f1-score   support
+
+           0       0.93      0.92      0.93       928
+           1       0.89      0.91      0.90       672
+
+    accuracy                           0.91      1600
+   macro avg       0.91      0.91      0.91      1600
+weighted avg       0.91      0.91      0.91      1600
+
+
+random_forest
+------------------------------
+ROC-AUC : 0.9684
+Precision: 0.8846
+Recall   : 0.8899
+F1       : 0.8872
+
+              precision    recall  f1-score   support
+
+           0       0.92      0.92      0.92       928
+           1       0.88      0.89      0.89       672
+
+    accuracy                           0.91      1600
+   macro avg       0.90      0.90      0.90      1600
+weighted avg       0.91      0.91      0.91      1600
+
+

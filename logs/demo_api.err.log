@@ -1,0 +1,7 @@
+2026-05-08 18:00:08,319 - monitoring_worker - INFO - worker_started
+2026-05-08 18:00:08,321 - api - INFO - api_starting
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.13.99.188:5000
+Press CTRL+C to quit

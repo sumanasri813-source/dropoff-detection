@@ -1,0 +1,15 @@
+Feature Engineering Report
+===================================
+Rows: 8000
+Columns: 19
+Engineered feature count: 8
+Target positive rate: 0.4199
+Engineered features:
+- activity_per_day
+- recency_ratio
+- feature_use_ratio
+- engagement_depth_score
+- dropoff_risk_proxy
+- device_risk_weight
+- segment_risk_weight
+- weighted_risk_proxy

@@ -1,0 +1,30 @@
+{
+  "metrics": {
+    "accuracy": 0.913625,
+    "precision": 0.8813607775871927,
+    "recall": 0.9178326883000893,
+    "f1": 0.8992270672305673,
+    "roc_auc": 0.9730784016723459,
+    "pr_auc": 0.9633108657370318,
+    "threshold": 0.5,
+    "business_value": 584850.0
+  },
+  "confusion_matrix": [
+    [
+      4226,
+      415
+    ],
+    [
+      276,
+      3083
+    ]
+  ],
+  "business_breakdown": {
+    "tn": 4226.0,
+    "fp": 415.0,
+    "fn": 276.0,
+    "tp": 3083.0,
+    "business_value": 584850.0
+  },
+  "threshold_analysis_csv": "results\\threshold_analysis.csv"
+}

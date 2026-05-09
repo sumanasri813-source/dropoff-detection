@@ -1,0 +1,32 @@
+environment: dev
+
+app:
+  debug: true
+  api_host: 0.0.0.0
+  api_port: 5000
+
+data:
+  use_sample_data: true
+  sample_size: 2000
+
+training:
+  run_xgboost: false
+  random_seed: 42
+
+monitoring:
+  enable_metrics: true
+  enable_drift_checks: false
+  log_level: DEBUG
+  monitor_worker_interval_sec: 30
+  alert_throttle_minutes: 5
+
+database:
+  type: sqlite
+  database: mlops/dev.db
+  url: ""
+  echo: false
+
+security:
+  require_auth: false
+  api_key: dev-local-key
+  api_key_env_var: API_KEY

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Thesis Diagram: Inference Engine</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; text-align: center; padding: 40px; }
+        .diagram-box { background: #f9fbff; border: 1px solid #e0e6ed; padding: 40px; margin: 20px auto; max-width: 900px; }
+        .print-btn { background: #3b82f6; color: white; padding: 12px 24px; border: none; cursor: pointer; border-radius: 6px; }
+        @media print { .print-btn, h2, p { display: none; } .diagram-box { border: none; background: white; } }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({ startOnLoad: true, theme: 'default' });</script>
+</head>
+<body>
+    <h2>2. Real-Time Inference Workflow</h2>
+    <p>How the dashboard communicates with the API to predict churn.</p>
+    <div class="diagram-box">
+        <div class="mermaid">
+            sequenceDiagram
+                participant U as Client App / Tracker
+                participant S as Streamlit Dashboard
+                participant A as Flask API
+                participant M as Model Engine
+                
+                U->>S: Input Behavioral Data
+                S->>A: HTTP POST /predict (JSON)
+                A->>M: Transform payload into features
+                M-->>A: Return Churn Probability %
+                A-->>S: Return JSON Response
+                S->>S: Interpret Risk (Low/Med/High)
+                S-->>U: Render SHAP & Gauges UI
+        </div>
+    </div>
+    <button class="print-btn" onclick="window.print()">Export Inference PDF</button>
+</body>
+</html>

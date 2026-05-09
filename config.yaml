@@ -1,0 +1,219 @@
+# User Drop-Off Detection Project Configuration
+# This file contains all project settings and parameters
+
+project:
+  name: "User Drop-Off Detection in Web Applications"
+  description: "Machine Learning system to detect and prevent user churn"
+  version: "1.0.0"
+  author: "Your Name"
+  date: "2024"
+
+# Data Configuration
+data:
+  # Definition of what constitutes a "drop-off"
+  dropoff_definition:
+    inactive_days: 30  # No activity for X days = drop-off
+    prediction_window: 30  # Predict drop-off within next X days
+  
+  # Data split ratios
+  train_test_split: 0.7
+  val_test_split: 0.15
+  test_split: 0.15
+  
+  # Random seed for reproducibility
+  random_seed: 42
+
+# Data Features Configuration
+features:
+  # Numeric/Continuous features
+  numeric_features:
+    - recency_days           # Days since last activity
+    - frequency_total        # Total number of activities
+    - session_duration_avg   # Average session time
+    - days_signup_age        # Days since registration
+    - feature_count_used     # Number of features used
+    - daily_activity_rate    # Activities per day
+  
+  # Categorical features
+  categorical_features:
+    - device_type            # mobile, desktop, tablet
+    - os_type                # windows, mac, linux, ios, android
+    - user_segment           # premium, free, trial
+    - region                 # geographic region
+  
+  # Temporal features
+  temporal_features:
+    - day_of_week_last_login
+    - hour_of_day_last_login
+    - month_signup
+  
+  # Feature selection parameters
+  max_features: 50          # Keep top N features
+  min_correlation: 0.05     # Minimum correlation with target
+  max_correlation: 0.95     # Remove highly correlated features
+
+# Model Training Configuration
+training:
+  # Which models to train
+  models_to_train:
+    - logistic_regression
+    - decision_tree
+    - random_forest
+    - xgboost
+    - lightgbm
+    - neural_network
+  
+  # Best model selection (based on validation set)
+  best_model_metric: "f1"  # accuracy, precision, recall, f1, auc
+  
+  # Cross-validation
+  cv_folds: 5
+  cv_strategy: "stratified"  # stratified, kfold, timeseries
+
+# Hyperparameter Tuning
+hyperparameter_tuning:
+  random_forest:
+    n_estimators: [50, 100, 200, 300]
+    max_depth: [5, 10, 15, 20]
+    min_samples_split: [2, 5, 10]
+    min_samples_leaf: [1, 2, 4]
+    max_features: ["sqrt", "log2"]
+  
+  xgboost:
+    n_estimators: [50, 100, 200, 500]
+    max_depth: [3, 5, 7, 9]
+    learning_rate: [0.01, 0.05, 0.1, 0.2, 0.3]
+    subsample: [0.6, 0.8, 1.0]
+    colsample_bytree: [0.5, 0.7, 1.0]
+  
+  lightgbm:
+    n_estimators: [50, 100, 200, 500]
+    max_depth: [5, 10, 15, 20]
+    learning_rate: [0.01, 0.05, 0.1, 0.2]
+    num_leaves: [20, 30, 40, 50]
+  
+  optimization:
+    method: "bayesian"  # bayesian, grid, random
+    max_evals: 50       # Number of hyperparameter combinations to try
+    n_startup_jobs: 10  # Initial random evaluations
+
+# Model Evaluation Configuration
+evaluation:
+  # Metrics to calculate
+  metrics:
+    - accuracy
+    - precision
+    - recall
+    - f1
+    - roc_auc
+    - pr_auc
+  
+  # Threshold optimization
+  threshold_optimization: true
+  threshold_range: [0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
+  
+  # Business metrics
+  cost_false_positive: 10    # Cost of unnecessary intervention
+  cost_false_negative: 100   # Cost of missing a drop-off
+  benefit_true_positive: 200 # Benefit of saving a user
+
+# Prediction Configuration
+prediction:
+  # Default prediction threshold (0.5 is neutral)
+  threshold: 0.65
+  
+  # Risk level classification
+  risk_levels:
+    high: 0.7      # Probability > 70%
+    medium: 0.4    # Probability 40-70%
+    low: 0.0       # Probability < 40%
+  
+  # Recommended actions per risk level
+  actions:
+    high: ["Send retention email", "Offer discount", "Personal outreach"]
+    medium: ["In-app message", "Feature recommendation"]
+    low: ["Monitor", "No action needed"]
+
+# Model Deployment Configuration
+deployment:
+  api:
+    host: "0.0.0.0"
+    port: 5000
+    debug: false
+    workers: 4
+  
+  # Model versioning
+  model_version: "1.0.0"
+  model_path: "models/final_model.pkl"
+  scaler_path: "models/feature_scaler.pkl"
+  
+  # Monitoring
+  monitoring_enabled: true
+  monitoring_interval: 3600  # seconds
+  
+  # Performance thresholds
+  performance_threshold:
+    min_accuracy: 0.80
+    min_auc: 0.75
+    alert_if_below: true
+
+# Logging Configuration
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  log_file: "logs/project.log"
+
+# Database Configuration (if using)
+database:
+  type: "postgresql"  # postgresql, mysql, sqlite
+  host: "localhost"
+  port: 5432
+  user: "your_username"
+  password: "your_password"
+  database: "dropoff_detection"
+  url: ""  # Optional full SQLAlchemy URL, overrides fields above when set
+  echo: false
+
+# Experiment Tracking
+experiment_tracking:
+  enabled: false
+  tool: "mlflow"  # mlflow, wandb, tensorboard
+  experiment_name: "user_dropoff_v1"
+  tracking_server: "http://localhost:5000"
+
+# Notifications
+notifications:
+  email_enabled: false
+  email_recipients:
+    - "your_email@university.edu"
+  slack_enabled: false
+  slack_webhook: ""
+
+# API Security Configuration
+security:
+  require_auth: false
+  api_key: ""
+  api_key_env_var: "API_KEY"
+  enable_rate_limiting: false
+
+# Random Seeds (for reproducibility)
+seeds:
+  numpy: 42
+  random: 42
+  tensorflow: 42
+  pytorch: 42
+
+# Paths
+paths:
+  data_raw: "data/raw/"
+  data_processed: "data/processed/"
+  models: "models/"
+  results: "results/"
+  logs: "logs/"
+  docs: "docs/"
+
+# Development Settings
+development:
+  debug_mode: true
+  sample_size: null  # Use all data (or set to 1000 for testing)
+  verbosity: 2
