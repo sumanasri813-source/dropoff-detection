@@ -34,7 +34,7 @@ jobs:
         pip install flask sqlalchemy pytest pytest-cov pyyaml \
                     python-dotenv structlog jsonschema flasgger \
                     flask-caching flask-limiter requests scikit-learn \
-                    pandas numpy joblib
+                    pandas numpy joblib psycopg2-binary pymysql
 
     - name: Run Tests with Coverage
       run: |
