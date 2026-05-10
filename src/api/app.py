@@ -349,6 +349,11 @@ def predict() -> tuple:
         description: Validation error
     """
     payload: Dict[str, Any] = request.get_json(silent=True) or {}
+    
+    if not payload:
+        collector.increment_counter("prediction_validation_errors")
+        return jsonify({"error": "Missing or empty payload.", "request_id": getattr(g, "request_id", "")}), 400
+
     ok, message = validate_payload(payload)
     if not ok:
         collector.increment_counter("prediction_validation_errors")
