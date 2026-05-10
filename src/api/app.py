@@ -306,7 +306,6 @@ def monitor_persist() -> tuple:
 
 @app.route("/predict", methods=["POST"])
 @require_api_key
-@cache.cached(timeout=60, query_string=True)
 def predict() -> tuple:
     """
     Predict churn risk for a single user profile.
