@@ -305,6 +305,45 @@ def health() -> tuple:
     return jsonify(response), (200 if health_payload.get("status") != "unhealthy" else 503)
 
 
+@app.route("/api/alerts", methods=["GET"])
+def get_latest_alerts() -> tuple:
+    """
+    Get latest system monitoring alerts.
+    ---
+    tags:
+      - System
+    responses:
+      200:
+        description: List of latest alerts
+    """
+    alerts_file = Path("mlops/monitoring/alerts/alerts.jsonl")
+    if not alerts_file.exists():
+        return jsonify([])
+
+    try:
+        with open(alerts_file, "r", encoding="utf-8") as f:
+            lines = f.readlines()
+            # Return last 15 alerts to show history
+            last_lines = lines[-15:]
+            alerts = []
+            for line in last_lines:
+                try:
+                    line_data = json.loads(line)
+                    # Standardize format for status page
+                    alerts.append({
+                        "timestamp": line_data.get("timestamp"),
+                        "type": line_data.get("type", "unknown"),
+                        "severity": line_data.get("severity", "info"),
+                        "message": line_data.get("message", "No message")
+                    })
+                except Exception:
+                    continue
+            return jsonify(alerts[::-1])  # Newest first
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+
 @app.route("/monitor", methods=["GET"])
 @require_api_key
 def monitor() -> tuple:

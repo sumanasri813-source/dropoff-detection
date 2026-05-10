@@ -1721,12 +1721,26 @@ def build_sankey_diagram() -> go.Figure:
 
 
 def build_segment_risk_donut() -> go.Figure:
-    segment_df = pd.DataFrame(
-        {
-            "Segment": ["Free", "Trial", "Premium", "Returning"],
-            "Risk Share": [42, 28, 12, 18],
-        }
-    )
+    live_df = load_live_prediction_frame(limit=1000)
+    if not live_df.empty:
+        # Focus on high and medium risk users for the "Risk Share" analysis
+        risk_users = live_df[live_df["risk_level"].isin(["high", "medium"])]
+        if not risk_users.empty:
+            grouped = risk_users.groupby("user_segment").size().reset_index(name="Risk Share")
+            grouped.columns = ["Segment", "Risk Share"]
+            # Clean up labels
+            grouped["Segment"] = grouped["Segment"].str.title()
+            segment_df = grouped
+        else:
+            segment_df = pd.DataFrame({"Segment": ["No At-Risk Users"], "Risk Share": [1]})
+    else:
+        segment_df = pd.DataFrame(
+            {
+                "Segment": ["Free", "Trial", "Premium", "Returning"],
+                "Risk Share": [42, 28, 12, 18],
+            }
+        )
+
     fig = px.pie(
         segment_df,
         names="Segment",
@@ -1786,6 +1800,55 @@ def build_event_volume_chart() -> go.Figure:
     )
     fig.update_layout(yaxis_title="Events", xaxis_title="Hour")
     return chart_layout(fig, 305)
+
+
+def build_feature_importance_chart() -> go.Figure:
+    """Build a bar chart showing model feature importance."""
+    model_path = Path("models/final_model.pkl")
+    if not model_path.exists():
+        return _build_empty_state_chart("Factor Analysis", "Model file not found.")
+
+    try:
+        import joblib
+        model = joblib.load(model_path)
+        
+        if hasattr(model, "coef_"):
+            coeffs = model.coef_[0]
+            features = getattr(model, "feature_names_in_", [f"f{i}" for i in range(len(coeffs))])
+            
+            importance_df = pd.DataFrame({
+                "Feature": features,
+                "Impact": coeffs
+            }).sort_values("Impact", key=abs, ascending=False).head(8)
+            
+            name_map = {
+                "recency_days": "Time Since Login",
+                "days_signup_age": "Account Age",
+                "session_duration_avg": "Usage Depth",
+                "frequency_total": "Engagement Rate",
+                "feature_count_used": "Feature Adoption",
+                "user_segment": "Plan Status"
+            }
+            importance_df["Factor"] = importance_df["Feature"].map(lambda x: name_map.get(x, x.replace('_', ' ').title()))
+            
+            # Sort by absolute impact for display
+            importance_df = importance_df.iloc[::-1] # flip for horizontal bar chart
+            
+            fig = px.bar(
+                importance_df,
+                x="Impact",
+                y="Factor",
+                orientation='h',
+                color="Impact",
+                color_continuous_scale="RdYlGn",
+                labels={"Impact": "Predictive Weight", "Factor": "Behavioral Signal"}
+            )
+            fig.update_layout(coloraxis_showscale=False, margin=dict(l=10, r=10, t=10, b=10))
+            return chart_layout(fig, 280)
+    except Exception:
+        pass
+
+    return _build_empty_state_chart("Factor Analysis", "Model analysis unavailable.")
 
 
 def build_region_heatmap() -> go.Figure:
@@ -1938,28 +2001,14 @@ if page == "Command Center":
     st.markdown(
         """
         <div class="panel">
-            <div class="panel-title">Analytical Workflow</div>
-            <div class="architecture-grid">
-                <div class="arch-tile">
-                    <div class="arch-mark"></div>
-                    <strong>Browser/App Events</strong>
-                    <span>Clickstream and session activity captured for analysis.</span>
-                </div>
-                <div class="arch-tile">
-                    <div class="arch-mark"></div>
-                    <strong>Feature Job</strong>
-                    <span>Events become user-level features such as recency, frequency, and usage depth.</span>
-                </div>
-                <div class="arch-tile">
-                    <div class="arch-mark"></div>
-                    <strong>Prediction Store</strong>
-                    <span>API scores are stored and summarized for retention teams.</span>
-                </div>
-            </div>
+            <div class="panel-title">Model Decision Drivers: Top Behavioral Signals</div>
+            <div class="panel-copy">Quantifying the impact of specific user behaviors on churn probability. Red indicates increased risk, green indicates higher retention probability.</div>
         </div>
         """,
         unsafe_allow_html=True,
     )
+    st.plotly_chart(build_feature_importance_chart(), use_container_width=True)
+
 
     visual_left, visual_right = st.columns([1.1, 0.9])
     with visual_left:
@@ -1985,28 +2034,38 @@ if page == "Command Center":
         st.plotly_chart(build_segment_risk_donut(), use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
+    live_df_full = load_live_prediction_frame(limit=1000)
+    if not live_df_full.empty:
+        risk_counts = live_df_full["risk_level"].value_counts(normalize=True) * 100
+        l_pct = f"{risk_counts.get('low', 0):.0f}%"
+        m_pct = f"{risk_counts.get('medium', 0):.0f}%"
+        h_pct = f"{risk_counts.get('high', 0):.0f}%"
+    else:
+        l_pct, m_pct, h_pct = "0%", "0%", "0%"
+
     st.markdown(
-        """
+        f"""
         <div class="risk-board">
             <div class="risk-card">
                 <span>Low Risk</span>
-                <strong>72%</strong>
+                <strong>{l_pct}</strong>
                 <p>Healthy users with regular activity.</p>
             </div>
             <div class="risk-card medium">
                 <span>Medium Risk</span>
-                <strong>19%</strong>
+                <strong>{m_pct}</strong>
                 <p>Need nudges and product guidance.</p>
             </div>
             <div class="risk-card high">
                 <span>High Risk</span>
-                <strong>9%</strong>
+                <strong>{h_pct}</strong>
                 <p>Priority users for retention action.</p>
             </div>
         </div>
         """,
         unsafe_allow_html=True,
     )
+
 
 
 # ============================================================================

@@ -425,27 +425,44 @@ STATUS_PAGE_HTML = """
                 <div class="metric-card"><div class="metric-value cyan">${driftSamples}</div><div class="metric-label">Drift Samples</div></div>
             `;
 
-            // Activity log
-            const activities = [];
-            if (totalReqs > 0) activities.push({ dot: 'green', text: `${totalReqs} total API requests processed`, time: now });
-            if (predictions > 0) activities.push({ dot: 'blue', text: `${predictions} ML predictions served successfully`, time: now });
-            if (counters.api_status_2xx) activities.push({ dot: 'green', text: `${counters.api_status_2xx} successful responses (2xx)`, time: now });
-            if (counters.auth_successes) activities.push({ dot: 'blue', text: `${counters.auth_successes} JWT login(s) authenticated`, time: now });
-            if (counters.prediction_validation_errors) activities.push({ dot: 'amber', text: `${counters.prediction_validation_errors} validation error(s) caught`, time: now });
-            if (counters.api_rate_limited) activities.push({ dot: 'amber', text: `${counters.api_rate_limited} request(s) rate limited`, time: now });
-            activities.push({ dot: 'green', text: 'System health check passed', time: now });
-            activities.push({ dot: 'blue', text: 'Prometheus metrics exported', time: now });
+            // Real-time Alerts log
+            fetchAlerts();
+        }
 
-            let actHtml = '';
-            activities.forEach(a => {
-                actHtml += `
-                    <div class="activity-item">
-                        <div class="activity-dot ${a.dot}"></div>
-                        <div>${a.text}</div>
-                        <div class="activity-time">${a.time}</div>
-                    </div>`;
-            });
-            document.getElementById('activity-log').innerHTML = actHtml;
+        async function fetchAlerts() {
+            const container = document.getElementById('activity-log');
+            try {
+                const res = await fetch('/api/alerts');
+                const alerts = await res.json();
+                
+                if (!alerts || !alerts.length || alerts.error) {
+                    container.innerHTML = `
+                        <div class="activity-item">
+                            <div class="activity-dot green"></div>
+                            <div>System heartbeat stable. No active alerts.</div>
+                            <div class="activity-time">${new Date().toLocaleTimeString()}</div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let html = '';
+                alerts.forEach(a => {
+                    const dotColor = a.severity === 'critical' ? 'rose' : (a.severity === 'warning' ? 'amber' : 'blue');
+                    const timeStr = a.timestamp ? new Date(a.timestamp).toLocaleTimeString() : 'Pending';
+                    html += `
+                        <div class="activity-item">
+                            <div class="activity-dot ${dotColor}"></div>
+                            <div style="flex:1"><strong>${a.type.replace('_', ' ').toUpperCase()}:</strong> ${a.message}</div>
+                            <div class="activity-time">${timeStr}</div>
+                        </div>`;
+                });
+                container.innerHTML = html;
+            } catch (err) {
+                container.innerHTML = '<div class="activity-item"><div class="activity-dot amber"></div><div>Waiting for alert data...</div></div>';
+            }
+        }
+
         }
 
         function renderOffline() {
