@@ -1409,6 +1409,7 @@ def load_live_prediction_frame(limit: int = 400) -> pd.DataFrame:
 
         phase = _phase_from_features(payload)
         region = str(payload.get("region", "unknown")).strip().title()
+        user_segment = str(payload.get("user_segment", "unknown")).strip().lower()
         risk_level = str(prediction.get("risk_level", "unknown")).strip().lower()
 
         rows.append(
@@ -1416,9 +1417,11 @@ def load_live_prediction_frame(limit: int = 400) -> pd.DataFrame:
                 "created_at": created_at,
                 "phase": phase,
                 "region": region or "Unknown",
+                "user_segment": user_segment,
                 "risk_level": risk_level,
             }
         )
+
 
     if not rows:
         return pd.DataFrame()
@@ -1812,9 +1815,22 @@ def build_feature_importance_chart() -> go.Figure:
         import joblib
         model = joblib.load(model_path)
         
-        if hasattr(model, "coef_"):
-            coeffs = model.coef_[0]
-            features = getattr(model, "feature_names_in_", [f"f{i}" for i in range(len(coeffs))])
+        # Extract classifier and preprocessor from Pipeline if applicable
+        if hasattr(model, "named_steps"):
+            classifier = model.named_steps.get("classifier")
+            preprocessor = model.named_steps.get("preprocessor")
+        else:
+            classifier = model
+            preprocessor = None
+
+        if classifier and hasattr(classifier, "coef_"):
+            coeffs = classifier.coef_[0]
+            
+            # Get feature names from preprocessor if available
+            if preprocessor and hasattr(preprocessor, "get_feature_names_out"):
+                features = preprocessor.get_feature_names_out()
+            else:
+                features = getattr(model, "feature_names_in_", [f"f{i}" for i in range(len(coeffs))])
             
             importance_df = pd.DataFrame({
                 "Feature": features,
@@ -1829,7 +1845,11 @@ def build_feature_importance_chart() -> go.Figure:
                 "feature_count_used": "Feature Adoption",
                 "user_segment": "Plan Status"
             }
-            importance_df["Factor"] = importance_df["Feature"].map(lambda x: name_map.get(x, x.replace('_', ' ').title()))
+            
+            # Clean technical names (e.g., 'num__recency' -> 'recency')
+            importance_df["Factor"] = importance_df["Feature"].apply(lambda x: str(x).split("__")[-1])
+            importance_df["Factor"] = importance_df["Factor"].map(lambda x: name_map.get(x, x.replace('_', ' ').title()))
+
             
             # Sort by absolute impact for display
             importance_df = importance_df.iloc[::-1] # flip for horizontal bar chart
@@ -2770,33 +2790,8 @@ elif page == "Model Intelligence":
             st.plotly_chart(chart_layout(fig_threshold, 340), use_container_width=True)
 
     with lower_right:
-        importance_df = pd.DataFrame(
-            {
-                "Feature": [
-                    "Recency",
-                    "Session Duration",
-                    "Feature Count",
-                    "Free Segment",
-                    "Mobile Device",
-                    "Frequency",
-                    "Account Age",
-                    "Region",
-                    "OS Type",
-                ],
-                "Importance": [0.28, 0.25, 0.24, 0.12, 0.08, 0.02, 0.01, 0.005, 0.005],
-            }
-        )
-        fig_importance = px.bar(
-            importance_df,
-            x="Importance",
-            y="Feature",
-            orientation="h",
-            color="Importance",
-            color_continuous_scale=["#1e1b4b", "#4338ca", "#818cf8", "#c4b5fd"],
-            title="Feature contribution",
-        )
-        fig_importance.update_layout(yaxis={"categoryorder": "total ascending"}, showlegend=False)
-        st.plotly_chart(chart_layout(fig_importance, 340), use_container_width=True)
+        st.plotly_chart(build_feature_importance_chart(), use_container_width=True)
+
 
     if not model_df.empty:
         display_model_df = model_df.copy()
