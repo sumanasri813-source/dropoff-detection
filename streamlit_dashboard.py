@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 import os
+import random
 import time
 from datetime import datetime
 from pathlib import Path
@@ -2457,7 +2458,17 @@ elif page == "Live Monitoring":
                 )
 
         st.markdown("#### ⚙️ System Pulse")
-        monitor_data = collector.get_api_snapshot()
+        
+        # Get real-time health and monitoring data from the API
+        monitor_data = {}
+        try:
+            # Note: We use the local API URL or the configured production one
+            health_res = requests.get(f"{API_URL}/health", timeout=1.5, headers={"X-API-Key": "dropoff_demo_key_2024"})
+            if health_res.status_code == 200:
+                monitor_data = health_res.json().get("monitoring", {})
+        except Exception:
+            pass
+
         latency = monitor_data.get("latency", {})
         avg_lat = latency.get("avg_ms", 0)
         p95_lat = latency.get("p95_ms", 0)
