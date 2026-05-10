@@ -23,6 +23,23 @@ import os
 
 # Mock webhook URL for demonstration
 SLACK_WEBHOOK_URL = os.getenv("SLACK_WEBHOOK_URL", "https://api.example.com/webhook")
+RISK_ALERTS_PATH = "mlops/monitoring/alerts/risk_alerts.jsonl"
+
+def persist_risk_alert(user_id, probability, factors):
+    """Saves the alert to a local file for dashboard integration."""
+    os.makedirs(os.path.dirname(RISK_ALERTS_PATH), exist_ok=True)
+    alert = {
+        "timestamp": datetime.now().isoformat(),
+        "type": "risk_alert",
+        "severity": "critical" if probability >= 0.85 else "warning",
+        "user_id": user_id,
+        "probability": float(probability),
+        "factors": factors,
+        "message": f"High risk detected for user {user_id}"
+    }
+    with open(RISK_ALERTS_PATH, "a", encoding="utf-8") as f:
+        f.write(json.dumps(alert) + "\n")
+
 
 def send_slack_alert(user_id, probability, factors):
     """Mocks sending a Slack alert to the retention team."""
@@ -37,6 +54,9 @@ def send_slack_alert(user_id, probability, factors):
     payload = {"text": msg}
     
     logging.info(f"Triggering Alert for User {user_id} (Prob: {probability:.2f})")
+    
+    # Persist for dashboard view
+    persist_risk_alert(user_id, probability, factors)
     
     # In production, this would be an actual POST request:
     # requests.post(SLACK_WEBHOOK_URL, json=payload)

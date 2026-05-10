@@ -1,0 +1,1 @@
+{"timestamp": "2026-05-10T06:54:56.081175+00:00", "level": "INFO", "logger": "security", "message": "security_headers_initialized", "extra": {"taskName": null}}

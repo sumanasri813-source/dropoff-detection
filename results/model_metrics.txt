@@ -37,3 +37,20 @@ F1       : 0.8872
 weighted avg       0.91      0.91      0.91      1600
 
 
+xgboost
+------------------------------
+ROC-AUC : 0.9671
+Precision: 0.8919
+Recall   : 0.8839
+F1       : 0.8879
+
+              precision    recall  f1-score   support
+
+           0       0.92      0.92      0.92       928
+           1       0.89      0.88      0.89       672
+
+    accuracy                           0.91      1600
+   macro avg       0.90      0.90      0.90      1600
+weighted avg       0.91      0.91      0.91      1600
+
+
