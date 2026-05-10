@@ -480,9 +480,22 @@ STATUS_PAGE_HTML = """
 
 def register_status_page(app: Flask) -> None:
     """Register the /status route on the Flask app."""
+    from flask import make_response
 
     @app.route("/status", methods=["GET"])
     def system_status_page():
-        return STATUS_PAGE_HTML, 200, {"Content-Type": "text/html"}
+        response = make_response(STATUS_PAGE_HTML, 200)
+        response.headers["Content-Type"] = "text/html; charset=utf-8"
+        # Override CSP to allow Google Fonts and inline scripts for this page
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'self'; "
+            "script-src 'self' 'unsafe-inline'; "
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+            "font-src 'self' https://fonts.gstatic.com; "
+            "img-src 'self' data:; "
+            "connect-src 'self'"
+        )
+        return response
 
     logger.info("status_page_registered", path="/status")
+
