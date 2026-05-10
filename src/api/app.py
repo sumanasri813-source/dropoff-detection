@@ -42,6 +42,7 @@ from src.utils.prometheus_exporter import generate_prometheus_metrics
 from src.utils.jwt_auth import authenticate_user, verify_jwt_token, require_jwt
 from src.utils.cors import init_cors
 from src.utils.security_headers import init_security_headers
+from src.utils.status_page import register_status_page
 
 
 app = Flask(__name__)
@@ -64,6 +65,9 @@ init_cors(app)
 
 # Initialize Security Headers (XSS, Clickjacking, HSTS protection)
 init_security_headers(app)
+
+# Register the real-time system status page at /status
+register_status_page(app)
 
 # Rate limiter: 100 requests per 60 seconds per API key
 rate_limiter = PerKeyRateLimiter(max_requests=100, window_seconds=60.0)
