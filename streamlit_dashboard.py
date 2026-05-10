@@ -2829,46 +2829,10 @@ elif page == "Strategic Thesis Report":
         st.markdown("</div>", unsafe_allow_html=True)
 
 
-                    predictions = pd.DataFrame(result.get("predictions", []))
-                    if predictions.empty:
-                        render_callout("warning", "No predictions returned", "Review validation details below.")
-                    else:
-                        enriched = uploaded_df.copy()
-                        enriched["dropoff_probability"] = predictions["dropoff_probability"].values
-                        enriched["risk_level"] = predictions["risk_level"].values
-                        enriched["predicted_label"] = predictions["predicted_label"].values
-                        high_risk_count = int((enriched["dropoff_probability"] >= 0.67).sum())
-                        st.metric("Records evaluated", len(enriched))
-                        st.metric("High-risk records", high_risk_count)
-                        st.dataframe(enriched, use_container_width=True, hide_index=True)
-
-                        export1, export2 = st.columns(2)
-                        with export1:
-                            st.download_button(
-                                "Download scored CSV",
-                                enriched.to_csv(index=False).encode("utf-8"),
-                                "dropoff_predictions.csv",
-                                "text/csv",
-                                use_container_width=True,
-                            )
-                        with export2:
-                            st.download_button(
-                                "Download scored JSON",
-                                enriched.to_json(orient="records", indent=2).encode("utf-8"),
-                                "dropoff_predictions.json",
-                                "application/json",
-                                use_container_width=True,
-                            )
-
-                    errors = result.get("errors", [])
-                    if errors:
-                        st.warning(f"{len(errors)} rows failed validation.")
-                        st.dataframe(pd.DataFrame(errors), use_container_width=True, hide_index=True)
-
-
 # ============================================================================
 # SYSTEM HEALTH
 # ============================================================================
+
 
 
 elif page == "System Health":
