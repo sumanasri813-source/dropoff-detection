@@ -2435,6 +2435,7 @@ elif page == "Live Monitoring":
         if not risk_alerts:
             st.success("No critical risk alerts in the current window.")
         else:
+            alert_html = ""
             for alert in risk_alerts:
                 severity = alert.get("severity", "warning")
                 kind = "danger" if severity == "critical" else "warning"
@@ -2442,20 +2443,23 @@ elif page == "Live Monitoring":
                 user_id = alert.get("user_id", "Unknown")
                 ts = datetime.fromisoformat(alert.get("timestamp")).strftime("%H:%M:%S")
                 
-                st.markdown(
-                    f"""
-                    <div class="callout {kind}" style="margin-bottom: 10px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <strong>{severity.upper()} RISK ALERT</strong>
-                            <span style="font-size: 0.7rem; color: var(--muted);">{ts}</span>
-                        </div>
-                        <div style="margin-top: 5px;">
-                            User <code>{user_id}</code>: <strong>{prob:.1%}</strong> probability
-                        </div>
+                alert_html += f"""
+                <div class="callout {kind}" style="padding: 10px 12px; margin: 0 0 8px 0; border-radius: 8px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem;">
+                        <strong style="letter-spacing: 0.01em;">{severity.upper()} ALERT</strong>
+                        <span style="font-size: 0.65rem; color: var(--muted);">{ts}</span>
                     </div>
-                    """,
-                    unsafe_allow_html=True
-                )
+                    <div style="margin-top: 4px; font-size: 0.88rem;">
+                        User <span style="color: var(--teal); font-weight: 600;">#{user_id}</span> : <strong>{prob:.1%}</strong> risk
+                    </div>
+                </div>
+                """
+            st.markdown(
+                f'<div class="visual-card" style="padding: 10px;"><div class="event-stream" style="max-height: 420px; padding-right: 8px; gap: 6px;">{alert_html}</div></div>',
+                unsafe_allow_html=True
+            )
+
+
 
         st.markdown("#### ⚙️ System Pulse")
         
