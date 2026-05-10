@@ -2443,17 +2443,18 @@ elif page == "Live Monitoring":
                 user_id = alert.get("user_id", "Unknown")
                 ts = datetime.fromisoformat(alert.get("timestamp")).strftime("%H:%M:%S")
                 
-                alert_html += f"""
-                <div class="callout {kind}" style="padding: 10px 12px; margin: 0 0 8px 0; border-radius: 8px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem;">
-                        <strong style="letter-spacing: 0.01em;">{severity.upper()} ALERT</strong>
-                        <span style="font-size: 0.65rem; color: var(--muted);">{ts}</span>
-                    </div>
-                    <div style="margin-top: 4px; font-size: 0.88rem;">
-                        User <span style="color: var(--teal); font-weight: 600;">#{user_id}</span> : <strong>{prob:.1%}</strong> risk
-                    </div>
-                </div>
-                """
+                alert_html += (
+                    f'<div class="callout {kind}" style="padding: 10px 12px; margin: 0 0 8px 0; border-radius: 8px;">'
+                    f'<div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem;">'
+                    f'<strong style="letter-spacing: 0.01em;">{severity.upper()} ALERT</strong>'
+                    f'<span style="font-size: 0.65rem; color: var(--muted);">{ts}</span>'
+                    f'</div>'
+                    f'<div style="margin-top: 4px; font-size: 0.88rem;">'
+                    f'User <span style="color: var(--teal); font-weight: 600;">#{user_id}</span> : <strong>{prob:.1%}</strong> risk'
+                    f'</div>'
+                    f'</div>'
+                )
+
             st.markdown(
                 f'<div class="visual-card" style="padding: 10px;"><div class="event-stream" style="max-height: 420px; padding-right: 8px; gap: 6px;">{alert_html}</div></div>',
                 unsafe_allow_html=True

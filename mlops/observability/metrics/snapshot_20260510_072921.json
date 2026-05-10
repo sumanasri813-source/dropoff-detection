@@ -1,0 +1,42 @@
+{
+  "timestamp": "2026-05-10T07:29:21.377603+00:00",
+  "snapshot": {
+    "events_total": 4665,
+    "counters": {
+      "api_requests_total": 2378,
+      "api_requests_POST_/predict": 2287,
+      "predictions_total": 2287,
+      "predictions_risk_low": 1677,
+      "api_requests_GET_/health": 22,
+      "api_status_2xx": 2378,
+      "predictions_risk_high": 476,
+      "api_requests_GET_/predictions": 65,
+      "predictions_risk_medium": 134,
+      "api_requests_GET_/monitor": 4
+    },
+    "latency": {
+      "count": 2378,
+      "avg_ms": 61.58558721688386,
+      "p95_ms": 122.4340999033302
+    },
+    "drift_stub": {
+      "status": "alert",
+      "baseline_mean": 0.5,
+      "current_mean": 0.2578913133857513,
+      "distance": 0.24210868661424872,
+      "samples": 1000,
+      "threshold": 0.1
+    }
+  },
+  "summary": {
+    "total_events": 4665,
+    "event_types": {
+      "latency": 2378,
+      "prediction": 2287
+    },
+    "modules": {
+      "api": 4665
+    },
+    "duration_seconds": 2062.571123
+  }
+}
