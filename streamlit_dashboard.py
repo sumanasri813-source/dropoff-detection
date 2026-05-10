@@ -2323,21 +2323,6 @@ elif page == "Make Prediction":
         st.caption("How each feature contributed to this specific prediction. Positive values increase churn risk.")
         st.plotly_chart(build_mock_shap_chart(risk_key), use_container_width=True)
 
-                action = "Trigger urgent retention campaign: discount offers, personal outreach, or exit survey."
-
-            st.markdown(
-                f"""
-                <div class="panel" style="border-left: 4px solid {bar_color}; background: {bg_color};">
-                    <div class="panel-title">{interp_title}</div>
-                    <p class="panel-copy">{interp_body}</p>
-                    <div style="margin-top: 12px; padding: 10px; background: rgba(255,255,255,0.7); border-radius: 8px;">
-                        <strong style="color: var(--ink); font-size: 0.85rem;">💡 Recommended Action</strong>
-                        <p style="margin: 4px 0 0; font-size: 0.85rem;">{action}</p>
-                    </div>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
 
         # Input summary table
         if pred_payload:
