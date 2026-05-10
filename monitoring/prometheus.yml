@@ -2,8 +2,27 @@ global:
   scrape_interval: 15s
   evaluation_interval: 15s
 
+# Alerting rules
+rule_files:
+  - "alert_rules.yml"
+
+# Scrape configurations
 scrape_configs:
-  - job_name: 'dropoff_api'
+  # Local development
+  - job_name: 'dropoff_api_local'
     metrics_path: '/metrics'
     static_configs:
       - targets: ['localhost:5000']
+        labels:
+          environment: 'development'
+
+  # Production (Render deployment)
+  - job_name: 'dropoff_api_production'
+    metrics_path: '/metrics'
+    scheme: 'https'
+    static_configs:
+      - targets: ['dropoff-detection.onrender.com']
+        labels:
+          environment: 'production'
+    scrape_interval: 30s
+    scrape_timeout: 10s

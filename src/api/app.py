@@ -5,7 +5,7 @@ import time
 import uuid
 from typing import Any, Dict
 
-from flask import Flask, g, jsonify, request
+from flask import Flask, Response, g, jsonify, request
 from flasgger import Swagger
 from flask_caching import Cache
 from sqlalchemy import text
@@ -38,6 +38,10 @@ from src.utils.monitoring_worker import BackgroundMonitorWorker
 from src.utils.runtime_config import load_api_config, load_model_path, load_monitoring_config
 from src.utils.errors import handle_error, MLPipelineError, DatabaseError, RateLimitError
 from src.utils.resilience import PerKeyRateLimiter, with_circuit_breaker
+from src.utils.prometheus_exporter import generate_prometheus_metrics
+from src.utils.jwt_auth import authenticate_user, verify_jwt_token, require_jwt
+from src.utils.cors import init_cors
+from src.utils.security_headers import init_security_headers
 
 
 app = Flask(__name__)
@@ -54,6 +58,12 @@ swagger = Swagger(app)
 
 # Initialize Advanced Response Caching (In-Memory)
 cache = Cache(app, config={'CACHE_TYPE': 'SimpleCache', 'CACHE_DEFAULT_TIMEOUT': 300})
+
+# Initialize CORS (Cross-Origin Resource Sharing) for Streamlit Cloud
+init_cors(app)
+
+# Initialize Security Headers (XSS, Clickjacking, HSTS protection)
+init_security_headers(app)
 
 # Rate limiter: 100 requests per 60 seconds per API key
 rate_limiter = PerKeyRateLimiter(max_requests=100, window_seconds=60.0)
@@ -297,6 +307,22 @@ def monitor() -> tuple:
     return jsonify(collector.get_api_snapshot()), 200
 
 
+@app.route("/metrics", methods=["GET"])
+def prometheus_metrics() -> Response:
+    """
+    Prometheus-compatible metrics endpoint.
+    ---
+    tags:
+      - Monitoring
+    responses:
+      200:
+        description: Prometheus text exposition format metrics
+    """
+    snapshot = collector.get_api_snapshot()
+    metrics_text = generate_prometheus_metrics(snapshot)
+    return Response(metrics_text, mimetype="text/plain; version=0.0.4; charset=utf-8")
+
+
 @app.route("/monitor/persist", methods=["POST"])
 @require_api_key
 def monitor_persist() -> tuple:
@@ -506,6 +532,149 @@ def predict_batch_route() -> tuple:
     result = predict_batch(model, records, threshold, risk_levels)
     status_code = 207 if result["failed_predictions"] > 0 else 200
     return jsonify({**result, "request_id": getattr(g, "request_id", "")}), status_code
+
+
+# ============================================================================
+# JWT AUTHENTICATION ENDPOINTS
+# ============================================================================
+
+@app.route("/auth/login", methods=["POST"])
+def jwt_login() -> tuple:
+    """
+    Authenticate and receive JWT tokens.
+    ---
+    tags:
+      - Authentication
+    parameters:
+      - in: body
+        name: credentials
+        schema:
+          type: object
+          required:
+            - username
+            - password
+          properties:
+            username:
+              type: string
+              example: admin
+            password:
+              type: string
+              example: admin123
+    responses:
+      200:
+        description: Authentication successful, returns access and refresh tokens
+      401:
+        description: Invalid credentials
+    """
+    payload = request.get_json(silent=True) or {}
+    username = payload.get("username", "").strip()
+    password = payload.get("password", "")
+
+    if not username or not password:
+        return jsonify({"error": "Username and password are required."}), 400
+
+    result = authenticate_user(username, password)
+    if not result:
+        collector.increment_counter("auth_failures")
+        return jsonify({"error": "Invalid username or password."}), 401
+
+    collector.increment_counter("auth_successes")
+    return jsonify(result), 200
+
+
+@app.route("/auth/refresh", methods=["POST"])
+def jwt_refresh() -> tuple:
+    """
+    Refresh an expired access token using a valid refresh token.
+    ---
+    tags:
+      - Authentication
+    parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            refresh_token:
+              type: string
+    responses:
+      200:
+        description: New access token issued
+      401:
+        description: Invalid or expired refresh token
+    """
+    payload = request.get_json(silent=True) or {}
+    refresh_token = payload.get("refresh_token", "")
+
+    if not refresh_token:
+        return jsonify({"error": "Refresh token is required."}), 400
+
+    is_valid, token_data = verify_jwt_token(refresh_token)
+    if not is_valid:
+        return jsonify({"error": "Invalid or expired refresh token."}), 401
+
+    from src.utils.jwt_auth import create_jwt_token
+    new_access_token = create_jwt_token(token_data["sub"], token_data["role"])
+
+    return jsonify({
+        "access_token": new_access_token,
+        "user_id": token_data["sub"],
+        "role": token_data["role"],
+    }), 200
+
+
+@app.route("/auth/me", methods=["GET"])
+@require_jwt()
+def jwt_me() -> tuple:
+    """
+    Get current authenticated user details.
+    ---
+    tags:
+      - Authentication
+    parameters:
+      - in: header
+        name: Authorization
+        type: string
+        required: true
+        description: "Bearer <jwt_token>"
+    responses:
+      200:
+        description: Current user info
+      401:
+        description: Not authenticated
+    """
+    return jsonify({
+        "user_id": getattr(g, "jwt_user", ""),
+        "role": getattr(g, "jwt_role", ""),
+    }), 200
+
+
+@app.route("/security/status", methods=["GET"])
+@require_api_key
+def security_status() -> tuple:
+    """
+    View current security configuration status.
+    ---
+    tags:
+      - Security
+    responses:
+      200:
+        description: Security configuration overview
+    """
+    return jsonify({
+        "api_key_auth": require_auth,
+        "jwt_auth": True,
+        "cors_enabled": True,
+        "security_headers": True,
+        "rate_limiting": {
+            "enabled": True,
+            "max_requests_per_minute": rate_limiter.max_requests,
+            "stats": rate_limiter.get_all_stats(),
+        },
+        "hsts": True,
+        "xss_protection": True,
+        "content_security_policy": True,
+    }), 200
 
 
 if __name__ == "__main__":

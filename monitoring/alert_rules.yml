@@ -1,0 +1,52 @@
+groups:
+  - name: dropoff_api_alerts
+    rules:
+      # Alert if API is down (no requests for 5 minutes)
+      - alert: APIDown
+        expr: increase(dropoff_api_requests_total[5m]) == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Drop-Off Detection API is not receiving requests"
+          description: "No API requests received in the last 5 minutes."
+
+      # Alert if latency exceeds 2 seconds
+      - alert: HighLatency
+        expr: dropoff_request_latency_p95_ms > 2000
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High API latency detected"
+          description: "P95 latency is {{ $value }}ms (threshold: 2000ms)."
+
+      # Alert if too many validation errors
+      - alert: HighValidationErrors
+        expr: rate(dropoff_prediction_validation_errors_total[5m]) > 0.5
+        for: 3m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High rate of validation errors on /predict"
+          description: "Validation error rate: {{ $value }} errors/sec."
+
+      # Alert if rate limiting is triggered
+      - alert: RateLimitTriggered
+        expr: increase(dropoff_rate_limited_total[5m]) > 0
+        for: 1m
+        labels:
+          severity: info
+        annotations:
+          summary: "API rate limiting was triggered"
+          description: "{{ $value }} requests were rate-limited in the last 5 minutes."
+
+      # Alert if model drift is detected
+      - alert: ModelDrift
+        expr: dropoff_drift_status == 0
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Model drift detected"
+          description: "The ML model drift detector reports an anomaly."

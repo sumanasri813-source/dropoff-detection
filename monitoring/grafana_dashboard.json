@@ -1,0 +1,164 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "description": "Real-time monitoring dashboard for the User Drop-Off Detection API",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "title": "🟢 API Health Status",
+      "type": "stat",
+      "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0},
+      "targets": [{"expr": "dropoff_api_requests_total", "legendFormat": "Total Requests"}],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "thresholds": {"steps": [{"color": "green", "value": 0}]}
+        }
+      }
+    },
+    {
+      "title": "📊 Predictions Served",
+      "type": "stat",
+      "gridPos": {"h": 4, "w": 6, "x": 6, "y": 0},
+      "targets": [{"expr": "dropoff_predictions_total", "legendFormat": "Predictions"}],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "thresholds": {"steps": [{"color": "#6366f1", "value": 0}]}
+        }
+      }
+    },
+    {
+      "title": "⚠️ Validation Errors",
+      "type": "stat",
+      "gridPos": {"h": 4, "w": 6, "x": 12, "y": 0},
+      "targets": [{"expr": "dropoff_prediction_validation_errors_total", "legendFormat": "Errors"}],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "thresholds": {"steps": [{"color": "green", "value": 0}, {"color": "yellow", "value": 5}, {"color": "red", "value": 20}]}
+        }
+      }
+    },
+    {
+      "title": "🚫 Rate Limited",
+      "type": "stat",
+      "gridPos": {"h": 4, "w": 6, "x": 18, "y": 0},
+      "targets": [{"expr": "dropoff_rate_limited_total", "legendFormat": "Rate Limited"}],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "thresholds": {"steps": [{"color": "green", "value": 0}, {"color": "red", "value": 1}]}
+        }
+      }
+    },
+    {
+      "title": "📈 Request Rate (per minute)",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 4},
+      "targets": [
+        {"expr": "rate(dropoff_api_requests_total[1m]) * 60", "legendFormat": "Requests/min"}
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"fixedColor": "#6366f1", "mode": "fixed"},
+          "custom": {"fillOpacity": 15, "lineWidth": 2, "gradientMode": "scheme"}
+        }
+      }
+    },
+    {
+      "title": "⏱️ Latency Overview",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 4},
+      "targets": [
+        {"expr": "dropoff_request_latency_avg_ms", "legendFormat": "Avg Latency (ms)"},
+        {"expr": "dropoff_request_latency_p95_ms", "legendFormat": "P95 Latency (ms)"}
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "custom": {"fillOpacity": 10, "lineWidth": 2}
+        }
+      }
+    },
+    {
+      "title": "🔀 HTTP Status Distribution",
+      "type": "piechart",
+      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 12},
+      "targets": [
+        {"expr": "dropoff_api_responses_total{status_group='2xx'}", "legendFormat": "2xx Success"},
+        {"expr": "dropoff_api_responses_total{status_group='4xx'}", "legendFormat": "4xx Client Error"},
+        {"expr": "dropoff_api_responses_total{status_group='5xx'}", "legendFormat": "5xx Server Error"}
+      ]
+    },
+    {
+      "title": "🧬 Model Drift Status",
+      "type": "gauge",
+      "gridPos": {"h": 8, "w": 8, "x": 8, "y": 12},
+      "targets": [{"expr": "dropoff_drift_status", "legendFormat": "Drift Status"}],
+      "fieldConfig": {
+        "defaults": {
+          "min": 0, "max": 1,
+          "thresholds": {"steps": [{"color": "red", "value": 0}, {"color": "green", "value": 1}]}
+        }
+      }
+    },
+    {
+      "title": "📦 Drift Samples Collected",
+      "type": "stat",
+      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 12},
+      "targets": [{"expr": "dropoff_drift_samples", "legendFormat": "Samples"}],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "thresholds": {"steps": [{"color": "yellow", "value": 0}, {"color": "green", "value": 100}]}
+        }
+      }
+    },
+    {
+      "title": "🔐 Authentication Events",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 20},
+      "targets": [
+        {"expr": "dropoff_api_endpoint_requests_total{path=~'.*auth.*'}", "legendFormat": "{{path}}"}
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {"fillOpacity": 20, "lineWidth": 2, "gradientMode": "scheme"}
+        }
+      }
+    },
+    {
+      "title": "🛡️ Security Events",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 20},
+      "targets": [
+        {"expr": "dropoff_rate_limited_total", "legendFormat": "Rate Limited"},
+        {"expr": "dropoff_prediction_validation_errors_total", "legendFormat": "Validation Errors"}
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "custom": {"fillOpacity": 10, "lineWidth": 2}
+        }
+      }
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": ["mlops", "dropoff-detection", "production"],
+  "templating": {"list": []},
+  "time": {"from": "now-1h", "to": "now"},
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Drop-Off Detection - Production Monitoring",
+  "uid": "dropoff-production",
+  "version": 1
+}
