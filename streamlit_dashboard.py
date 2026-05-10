@@ -1067,7 +1067,14 @@ ACADEMIC_DIVERGING_SCALE = ["#f2f3f3", "#d5dbdb", "#aab7b8", "#687078", "#414d5c
 # CONFIGURATION
 # ============================================================================
 
-API_URL = os.getenv("DROPOFF_API_URL", "http://127.0.0.1:5000")
+# Try Streamlit secrets first (Streamlit Cloud), then env vars, then localhost fallback
+try:
+    API_URL = st.secrets.get("API_URL", "") or st.secrets.get("DROPOFF_API_URL", "")
+except Exception:
+    API_URL = ""
+if not API_URL:
+    API_URL = os.getenv("DROPOFF_API_URL", "") or os.getenv("API_URL", "") or "http://127.0.0.1:5000"
+API_URL = API_URL.rstrip("/")
 API_TIMEOUT = 10
 
 DEMO_PROFILES: Dict[str, Dict[str, Any]] = {
