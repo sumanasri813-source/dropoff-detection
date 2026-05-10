@@ -425,18 +425,6 @@ STATUS_PAGE_HTML = """
                 <div class="metric-card"><div class="metric-value cyan">${driftSamples}</div><div class="metric-label">Drift Samples</div></div>
             `;
 
-            // Simulated latency bars (using avg and some randomization)
-            const barsContainer = document.getElementById('latency-bars');
-            let barsHtml = '';
-            const base = parseFloat(avgLatency) || 100;
-            for (let i = 0; i < 30; i++) {
-                const jitter = (Math.random() - 0.4) * base * 0.8;
-                const ms = Math.max(20, base + jitter);
-                const height = Math.min(100, Math.max(8, (ms / (base * 2)) * 100));
-                barsHtml += `<div class="latency-bar" style="height:${height}%" data-ms="${ms.toFixed(0)}ms"></div>`;
-            }
-            barsContainer.innerHTML = barsHtml;
-
             // Activity log
             const activities = [];
             if (totalReqs > 0) activities.push({ dot: 'green', text: `${totalReqs} total API requests processed`, time: now });

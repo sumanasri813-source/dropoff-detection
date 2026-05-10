@@ -5,7 +5,7 @@ Write-Host "SILENT USER DROP-OFF DETECTION" -ForegroundColor Cyan
 Write-Host "Auto-Run System Setup" -ForegroundColor Cyan
 Write-Host "==================================" -ForegroundColor Cyan
 
-$projectPath = "C:\Users\Sumana Sri\OneDrive\Desktop\project\user-dropoff-detection"
+$projectPath = $PSScriptRoot
 Set-Location $projectPath
 
 # ==========================================
@@ -35,7 +35,7 @@ Write-Host "[OK] Cleanup complete" -ForegroundColor Green
 # ==========================================
 Write-Host "`n[STEP 2] Starting Flask API Server..." -ForegroundColor Yellow
 Start-Job -Name "FlaskAPI" -ScriptBlock {
-    Set-Location "C:\Users\Sumana Sri\OneDrive\Desktop\project\user-dropoff-detection"
+    Set-Location $projectPath
     python -m src.api.app
 } | Out-Null
 
@@ -67,7 +67,7 @@ if ($apiCheck) {
 # ==========================================
 Write-Host "`n[STEP 3] Starting Streamlit Dashboard..." -ForegroundColor Yellow
 Start-Job -Name "StreamlitDash" -ScriptBlock {
-    Set-Location "C:\Users\Sumana Sri\OneDrive\Desktop\project\user-dropoff-detection"
+    Set-Location $projectPath
     python -m streamlit run streamlit_dashboard.py --server.port 8502 --client.showErrorDetails=false --logger.level=error
 } | Out-Null
 
