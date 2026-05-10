@@ -2291,32 +2291,31 @@ elif page == "Make Prediction":
             st.plotly_chart(build_gauge(probability), use_container_width=True)
 
         with res_col2:
+            rec_text = (
+                "High churn risk detected. Immediate multi-channel retention sequence recommended. Offer high-value personalized incentives and direct support outreach." if risk_key == "high" else
+                "Moderate risk signals observed. Automate personalized re-engagement workflow targeting unused features and highlighting platform value." if risk_key == "medium" else
+                "User profile is stable. Maintain standard engagement cycles. Consider enrollment in VIP/Loyalty programs to further secure LTV."
+            )
+            confidence = f"{(1 - abs(0.5 - probability) * 0.4) * 100:.1f}%"
+            latency = f"{random.randint(12, 45)}ms"
+            
             st.markdown(
-                f"""
-                <div class="visual-card" style="height: 100%; padding: 25px;">
-                    <div class="visual-title">Strategic AI Recommendation</div>
-                    <div class="visual-copy">Automated guidance based on model confidence and behavioral patterns.</div>
-                    
-                    <div style="margin-top: 25px; padding: 20px; border-radius: 12px; background: rgba(255,255,255,0.03); border-left: 4px solid {risk_color};">
-                        <strong style="color: var(--ink); font-size: 1.1rem;">Intervention Protocol: {risk_label.title()}</strong>
-                        <p style="margin-top: 10px; font-size: 0.92rem; color: var(--ink);">
-                            {
-                                "High churn risk detected. Immediate multi-channel retention sequence recommended. Offer high-value personalized incentives and direct support outreach." if risk_key == "high" else
-                                "Moderate risk signals observed. Automate personalized re-engagement workflow targeting unused features and highlighting platform value." if risk_key == "medium" else
-                                "User profile is stable. Maintain standard engagement cycles. Consider enrollment in VIP/Loyalty programs to further secure LTV."
-                            }
-                        </p>
-                    </div>
-                    
-                    <div style="margin-top: 20px;">
-                        <div class="mini-stat"><span>Confidence</span><strong>{(1 - abs(0.5 - probability) * 0.4) * 100:.1f}%</strong></div>
-                        <div style="margin-top: 8px;" class="mini-stat"><span>Inference Latency</span><strong>{random.randint(12, 45)}ms</strong></div>
-                        <div style="margin-top: 8px;" class="mini-stat"><span>Model Version</span><strong>v2.4.0-PROD</strong></div>
-                    </div>
-                </div>
-                """,
+                f'<div class="visual-card" style="height: 100%; padding: 25px;">'
+                f'<div class="visual-title">Strategic AI Recommendation</div>'
+                f'<div class="visual-copy">Automated guidance based on model confidence and behavioral patterns.</div>'
+                f'<div style="margin-top: 25px; padding: 20px; border-radius: 12px; background: rgba(255,255,255,0.03); border-left: 4px solid {risk_color};">'
+                f'<strong style="color: var(--ink); font-size: 1.1rem;">Intervention Protocol: {risk_label.title()}</strong>'
+                f'<p style="margin-top: 10px; font-size: 0.92rem; color: var(--ink);">{rec_text}</p>'
+                f'</div>'
+                f'<div style="margin-top: 20px;">'
+                f'<div class="mini-stat"><span>Confidence</span><strong>{confidence}</strong></div>'
+                f'<div style="margin-top: 8px;" class="mini-stat"><span>Inference Latency</span><strong>{latency}</strong></div>'
+                f'<div style="margin-top: 8px;" class="mini-stat"><span>Model Version</span><strong>v2.4.0-PROD</strong></div>'
+                f'</div>'
+                f'</div>',
                 unsafe_allow_html=True
             )
+
 
         st.markdown("<div style='margin-top: 25px;'></div>", unsafe_allow_html=True)
         st.markdown("#### Model Interpretability (SHAP)")
