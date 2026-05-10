@@ -2370,9 +2370,7 @@ elif page == "Make Prediction":
             )
             st.dataframe(input_summary, use_container_width=True, hide_index=True)
 
-        st.markdown("#### Model Interpretability (SHAP)")
-        st.caption("How each feature contributed to this specific prediction. Positive values increase churn risk.")
-        st.plotly_chart(build_mock_shap_chart(risk_key), use_container_width=True)
+
 
 
 # ============================================================================
