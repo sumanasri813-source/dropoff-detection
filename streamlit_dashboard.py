@@ -1846,7 +1846,6 @@ NAV_LABELS = {
     "AI Assistant": "08  AI Insights",
     "Admin Control": "09  Admin Panel",
 }
-}
 
 if "page" not in st.session_state:
     st.session_state["page"] = PAGES[0]
