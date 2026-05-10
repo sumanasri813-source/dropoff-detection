@@ -298,32 +298,7 @@ st.markdown(
         text-transform: uppercase;
     }
 
-    /* --- RESPONSIVENESS OVERHAUL --- */
-    @media (max-width: 1024px) {
-        .app-hero { grid-template-columns: 1fr; min-height: auto; }
-        .hero-copy { padding: 1.5rem; }
-        .hero-copy h1 { font-size: 1.5rem; }
-        .topbar { flex-direction: column; align-items: flex-start; gap: 1rem; padding: 1rem; }
-        .topbar-actions { justify-content: flex-start; width: 100%; }
-    }
 
-    @media (max-width: 768px) {
-        .main .block-container { padding: 1rem; }
-        .signal-grid { grid-template-columns: repeat(3, 1fr); height: 100px; }
-        .signal-bar:nth-child(n+4) { display: none; }
-        .signal-foot { grid-template-columns: 1fr; }
-        div[data-testid="stHorizontalBlock"] { flex-direction: column !important; }
-        div[data-testid="column"] { width: 100% !important; margin-bottom: 1rem; }
-        .kpi-card { min-height: 100px; padding: 1rem; }
-        .kpi-value { font-size: 1.5rem !important; }
-    }
-
-    @media (max-width: 480px) {
-        .brand-mark { width: 32px; height: 32px; min-width: 32px; font-size: 0.8rem; }
-        .brand-title { font-size: 0.85rem; }
-        .section-head h2 { font-size: 1.4rem; }
-        div[data-testid="stPills"] { overflow-x: auto; display: flex; white-space: nowrap; }
-    }
 
     .kpi-value {
         color: var(--ink);
@@ -969,24 +944,24 @@ st.markdown(
         }
     }
 
+    @media (max-width: 1024px) {
+        .app-hero { grid-template-columns: 1fr; min-height: auto; }
+        .hero-copy { padding: 1.5rem; }
+        .hero-copy h1 { font-size: 1.5rem; }
+        .topbar { flex-direction: column; align-items: flex-start; gap: 1rem; padding: 1rem; }
+        .topbar-actions { justify-content: flex-start; width: 100%; }
+    }
+
     @media (max-width: 768px) {
-        .topbar {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-
-        .topbar-actions {
-            justify-content: flex-start;
-            width: 100%;
-        }
-
-        .main .block-container {
-            padding: 1rem 0.75rem;
-        }
-
-        .hero-copy h1 {
-            font-size: 1.75rem;
-        }
+        .main .block-container { padding: 1rem 0.75rem; }
+        .signal-grid { grid-template-columns: repeat(3, 1fr); height: 100px; }
+        .signal-bar:nth-child(n+4) { display: none; }
+        .signal-foot { grid-template-columns: 1fr; }
+        div[data-testid="stHorizontalBlock"] { flex-direction: column !important; }
+        div[data-testid="column"] { width: 100% !important; margin-bottom: 1rem; }
+        .kpi-card { min-height: 100px; padding: 1rem; }
+        .kpi-value { font-size: 1.5rem !important; }
+        .hero-copy h1 { font-size: 1.75rem; }
 
         .pipeline-strip,
         .architecture-grid,
@@ -1008,6 +983,14 @@ st.markdown(
             justify-self: start;
         }
     }
+
+    @media (max-width: 480px) {
+        .brand-mark { width: 32px; height: 32px; min-width: 32px; font-size: 0.8rem; }
+        .brand-title { font-size: 0.85rem; }
+        .section-head h2 { font-size: 1.4rem; }
+        div[data-testid="stPills"] { overflow-x: auto; display: flex; white-space: nowrap; }
+    }
+
 
     /* === PREMIUM ANIMATIONS === */
     @keyframes gradientShift {
@@ -2162,11 +2145,10 @@ if page == "Command Center":
         st.markdown("</div>", unsafe_allow_html=True)
 
 
-
-
 # ============================================================================
 # MAKE PREDICTION
 # ============================================================================
+
 
 elif page == "Make Prediction":
     st.markdown(
@@ -2373,7 +2355,6 @@ elif page == "Make Prediction":
                 ]
             )
             st.dataframe(input_summary, use_container_width=True, hide_index=True)
-
 
 
 
