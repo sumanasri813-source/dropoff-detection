@@ -2041,18 +2041,7 @@ report_html = f"""
 </html>
 """
 
-col_nav, col_export = st.columns([0.85, 0.15])
-with col_export:
-    st.download_button(
-        label="📄 Export Strategic Report",
-        data=report_html,
-        file_name="retention_intelligence_report.html",
-        mime="text/html",
-        use_container_width=True,
-    )
-
-with col_nav:
-    selected_page = st.pills(
+selected_page = st.pills(
     "Dashboard navigation",
     PAGES,
     default=st.session_state["page"],
@@ -2069,17 +2058,28 @@ page = st.session_state["page"]
 # ============================================================================
 
 if page == "Command Center":
-    st.markdown(
-        """
-        <div class="section-head">
-            <div>
-                <h2>Project Overview</h2>
-                <p>Summary view of retention risk, model strength, and project evidence.</p>
+    head_col1, head_col2 = st.columns([0.8, 0.2])
+    with head_col1:
+        st.markdown(
+            """
+            <div class="section-head" style="margin-top: 0;">
+                <div>
+                    <h2>Project Overview</h2>
+                    <p>Summary view of retention risk, model strength, and project evidence.</p>
+                </div>
             </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+            """,
+            unsafe_allow_html=True,
+        )
+    with head_col2:
+        st.markdown("<div style='margin-top: 22px;'></div>", unsafe_allow_html=True)
+        st.download_button(
+            label="📄 Export Strategic Report",
+            data=report_html,
+            file_name="retention_intelligence_report.html",
+            mime="text/html",
+            use_container_width=True,
+        )
 
     hero_col, signal_col = st.columns([1.18, 0.82])
     with hero_col:
