@@ -1945,7 +1945,7 @@ PAGES = [
     "Live Monitoring",
     "Model Intelligence",
     "Batch Scoring",
-    "Strategic Thesis Report",
+    "Advanced Analytics",
     "System Health",
 ]
 
@@ -1955,9 +1955,10 @@ NAV_LABELS = {
     "Live Monitoring": "03  Real-Time Ops",
     "Model Intelligence": "04  Evaluation",
     "Batch Scoring": "05  Batch Scoring",
-    "Strategic Thesis Report": "06  Thesis Report",
+    "Advanced Analytics": "06  Deep Insights",
     "System Health": "07  Infrastructure",
 }
+
 
 
 if "page" not in st.session_state:
@@ -2707,107 +2708,33 @@ elif page == "Batch Scoring":
                         st.error(f"Engine Failure: {msg}")
 
 # ============================================================================
-# STRATEGIC THESIS REPORT
+# ADVANCED ANALYTICS
 # ============================================================================
 
-elif page == "Strategic Thesis Report":
+elif page == "Advanced Analytics":
     st.markdown(
         """
         <div class="section-head">
             <div>
-                <h2>Strategic Thesis Presentation</h2>
-                <p>Consolidated technical evidence, system architecture, and project conclusions for final examination.</p>
+                <h2>Advanced Behavioral Insights</h2>
+                <p>Deep-dive analysis of user journey progression and segment-specific revenue risk exposure.</p>
             </div>
         </div>
         """,
         unsafe_allow_html=True,
     )
-    
-    rep_l, rep_r = st.columns([1.2, 0.8])
-    
-    with rep_l:
-        st.markdown(
-            """
-            <div class="visual-card" style="padding: 30px;">
-                <div class="visual-title">Executive Abstract</div>
-                <div style="font-size: 1.1rem; line-height: 1.8; color: var(--ink); margin-top: 15px;">
-                    This research implements a <strong>Production Machine Learning System</strong> for 
-                    identifying user churn in real-time. By utilizing high-fidelity behavioral signals 
-                    and advanced gradient boosting (XGBoost), we achieve a predictive precision of 
-                    <strong>0.973 ROC-AUC</strong>.
-                </div>
-                <div style="margin-top: 25px; padding: 20px; border-radius: 12px; background: rgba(99,102,241,0.05); border-left: 4px solid var(--blue);">
-                    <strong style="color: var(--blue);">Key Scientific Contribution:</strong>
-                    <p style="margin-top: 8px; font-size: 0.95rem;">
-                        Demonstrating the feasibility of low-latency (<50ms) behavioral inference 
-                        integrated with automated alerting systems for proactive revenue retention 
-                        in SaaS ecosystems.
-                    </p>
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-        
-        st.markdown("### Technical Methodology")
-        with st.expander("1. Data Engineering & Synthetic Synthesis", expanded=True):
-            st.write("Generated 10,000+ behavioral profiles using Bayesian distributions to simulate realistic SaaS interaction patterns (Logins, Session Decay, Feature Adoption).")
-        with st.expander("2. Model Architecture (XGBoost)"):
-            st.write("Implemented an XGBoost classification engine with Hyperopt-tuned hyperparameters. Feature importance is validated using SHAP (Shapley Additive Explanations) for model transparency.")
-        with st.expander("3. Production Observability"):
-            st.write("Integrated a real-time event-streaming architecture (Flask + Streamlit) with localized JSONL persistence for sub-second risk alerting.")
 
-    with rep_r:
-        st.markdown(
-            """
-            <div class="visual-card" style="padding: 25px;">
-                <div class="visual-title">System Architecture</div>
-                <div class="visual-copy">Full-stack workflow overview.</div>
-                
-                <div style="margin-top: 20px; border: 1px solid var(--line); border-radius: 8px; padding: 15px; background: white; text-align: center;">
-                    <img src="https://mermaid.ink/img/pako:eNptkU1vwyAMhv8K8mkr9QekHtoetMtuu-y2S_XAmMQShEAmjapV_30BmqSdtp78YfvI59mGDbYWGzx9rtXG-6X7e-hG6p660VAtX859-f2L-vL_2R966vshP6lM67A5E5_T6Xz_8O-68U89XInX67rI9-l_A3yZ7vInWc4-yNvpYpXmYhOqCclmZ-LzY7G-v0fFfGZid36OysTfIueh_V6R0-6X2_4y36R9vkhze0m7p6R9pI-P0n1Onx91_6Lu_69q_XfVPpS-hU89P_66v5W_mY-f-Tj_u5_7f_9H_3zE?type=png" style="width: 100%; border-radius: 4px;">
-                </div>
-                
-                <div style="margin-top: 20px;">
-                    <div class="mini-stat"><span>Primary Model</span><strong>XGBoost v1.7</strong></div>
-                    <div style="margin-top: 8px;" class="mini-stat"><span>Data Store</span><strong>SQLite 3.x</strong></div>
-                    <div style="margin-top: 8px;" class="mini-stat"><span>Auth Layer</span><strong>JWT / RBAC</strong></div>
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-        
-        st.markdown(
-            """
-            <div class="visual-card" style="margin-top: 20px;">
-                <div class="visual-title">Thesis Documentation</div>
-                <div class="visual-copy">Direct access to research artifacts.</div>
-                <div style="margin-top: 15px;">
-        """,
-        unsafe_allow_html=True
-        )
-        st.button("📄 View Methodology PDF", use_container_width=True)
-        st.button("📊 Export Results Dataset", use_container_width=True)
-        st.markdown("</div></div>", unsafe_allow_html=True)
-
-    # Combined Deep Insights Row
-    st.markdown("### Behavioral Flow & Revenue Impact")
-    st.caption("Visualizing user progression and financial exposure across segments.")
+    st.markdown("### User Lifecycle & Flow")
+    st.caption("Visualizing user transitions from acquisition to retention or churn.")
     
-    ins_l, ins_r = st.columns([1.1, 0.9])
-    with ins_l:
-        st.markdown(
-            """
-            <div class="visual-card">
-                <div class="visual-title">User Journey Sankey</div>
-            """,
-            unsafe_allow_html=True
-        )
-        st.plotly_chart(build_sankey_diagram(), use_container_width=True)
-        st.markdown("</div>", unsafe_allow_html=True)
-        
-    with ins_r:
+    st.plotly_chart(build_sankey_diagram(), use_container_width=True)
+
+    st.markdown("### Revenue & Retention Impact")
+    st.caption("Projected financial exposure across high-value subscription segments.")
+    
+    rev_l, rev_r = st.columns([1.2, 0.8])
+    
+    with rev_l:
         rev_data = pd.DataFrame({
             "Segment": ["Premium", "Trial", "Free", "Returning"],
             "At-Risk Revenue": [24500, 12800, 0, 5600],
@@ -2816,17 +2743,26 @@ elif page == "Strategic Thesis Report":
         fig_rev = px.bar(
             rev_data, x="Segment", y=["Retained Revenue", "At-Risk Revenue"],
             barmode="stack", color_discrete_map={"Retained Revenue": "#22c55e", "At-Risk Revenue": "#f43f5e"},
-            height=340
+            height=350
         )
+        st.plotly_chart(fig_rev, use_container_width=True)
+        
+    with rev_r:
         st.markdown(
-            """
-            <div class="visual-card">
-                <div class="visual-title">Revenue Exposure</div>
+            f"""
+            <div class="visual-card" style="border-left: 4px solid var(--rose);">
+                <div class="visual-title">Priority Segments</div>
+                <div class="visual-copy">Segments requiring immediate retention intervention.</div>
+                <div style="margin-top: 20px;">
+                    <div class="mini-stat"><span>Priority 1</span><strong>Premium (North)</strong></div>
+                    <div style="margin-top: 8px;" class="mini-stat"><span>Priority 2</span><strong>Trial (West)</strong></div>
+                </div>
+            </div>
             """,
             unsafe_allow_html=True
         )
-        st.plotly_chart(fig_rev, use_container_width=True)
-        st.markdown("</div>", unsafe_allow_html=True)
+
+
 
 
 # ============================================================================
