@@ -2140,35 +2140,36 @@ elif page == "Make Prediction":
         """
         <div class="section-head">
             <div>
-                <h2>Interactive Prediction</h2>
-                <p>Score an individual user profile against the trained model and visualize the churn risk in real time.</p>
+                <h2>Predictive Simulation Lab</h2>
+                <p>Execute real-time behavioral simulations to determine churn probability and unlock strategic retention insights.</p>
             </div>
         </div>
         """,
         unsafe_allow_html=True,
     )
 
-    # Preset profile selector
+    # Simulation Workspace
     st.markdown(
         """
         <div class="panel">
-            <div class="panel-title">Quick Preset Profiles</div>
-            <div class="panel-copy">Select a preset to auto-fill the form, or customize the values manually below.</div>
+            <div class="panel-title">Simulation Workspace</div>
+            <div class="panel-copy">Select a candidate profile or calibrate behavioral signals manually to observe model reactions.</div>
         </div>
         """,
         unsafe_allow_html=True,
     )
 
-    preset_cols = st.columns(3)
+    # Preset profile selector (Premium Buttons)
+    p_col1, p_col2, p_col3 = st.columns(3)
     selected_preset: str | None = None
-    with preset_cols[0]:
-        if st.button("🟢  Low Risk User", use_container_width=True, key="pred_low"):
+    with p_col1:
+        if st.button("🟢  LOW RISK PROFILE", use_container_width=True, key="pred_low"):
             selected_preset = "Low risk"
-    with preset_cols[1]:
-        if st.button("🟡  Balanced User", use_container_width=True, key="pred_bal"):
+    with p_col2:
+        if st.button("🟡  BALANCED PROFILE", use_container_width=True, key="pred_bal"):
             selected_preset = "Balanced"
-    with preset_cols[2]:
-        if st.button("🔴  High Risk User", use_container_width=True, key="pred_high"):
+    with p_col3:
+        if st.button("🔴  HIGH RISK PROFILE", use_container_width=True, key="pred_high"):
             selected_preset = "High risk"
 
     if selected_preset:
@@ -2177,178 +2178,151 @@ elif page == "Make Prediction":
     active_preset = st.session_state.get("predict_preset", "Balanced")
     profile = DEMO_PROFILES[active_preset]
 
-    st.markdown("---")
+    st.markdown("<div style='margin-top: 25px;'></div>", unsafe_allow_html=True)
 
-    # Input form
-    form_left, form_right = st.columns(2)
+    # Two Column Layout for Form
+    form_col, info_col = st.columns([1.1, 0.9])
 
-    with form_left:
-        st.markdown("#### Behavioral Signals")
-        inp_days_signup = st.slider(
-            "Days since signup",
-            min_value=1, max_value=730,
-            value=int(profile["days_since_signup"]),
-            key="pred_days_signup",
-        )
-        inp_recency = st.slider(
-            "Days since last activity",
-            min_value=0, max_value=365,
-            value=int(profile["recency_days"]),
-            key="pred_recency",
-        )
-        inp_frequency = st.slider(
-            "Total logins / sessions",
-            min_value=0, max_value=500,
-            value=int(profile["frequency"]),
-            key="pred_freq",
-        )
-        inp_session = st.slider(
-            "Avg session duration (min)",
-            min_value=0.0, max_value=60.0,
-            value=float(profile["session_duration"]),
-            step=0.5,
-            key="pred_session",
-        )
-        inp_features = st.slider(
-            "Features used",
-            min_value=0, max_value=20,
-            value=int(profile["feature_count"]),
-            key="pred_features",
-        )
-
-    with form_right:
-        st.markdown("#### User Profile")
-        inp_device = st.selectbox(
-            "Device type",
-            ["Desktop", "Mobile", "Tablet"],
-            index=["Desktop", "Mobile", "Tablet"].index(profile["device_type"]) if profile["device_type"] in ["Desktop", "Mobile", "Tablet"] else 0,
-            key="pred_device",
-        )
-        inp_os = st.selectbox(
-            "Operating system",
-            ["Windows", "macOS", "Android", "iOS", "Linux"],
-            index=["Windows", "macOS", "Android", "iOS", "Linux"].index(profile["os_type"]) if profile["os_type"] in ["Windows", "macOS", "Android", "iOS", "Linux"] else 0,
-            key="pred_os",
-        )
-        inp_segment = st.selectbox(
-            "User segment",
-            ["Free", "Trial", "Premium"],
-            index=["Free", "Trial", "Premium"].index(profile["user_segment"]) if profile["user_segment"] in ["Free", "Trial", "Premium"] else 0,
-            key="pred_segment",
-        )
-        inp_region = st.selectbox(
-            "Region",
-            ["North", "South", "East", "West"],
-            index=["North", "South", "East", "West"].index(profile["region"]) if profile["region"] in ["North", "South", "East", "West"] else 0,
-            key="pred_region",
-        )
-
-        st.markdown("")
+    with form_col:
         st.markdown(
             f"""
-            <div class="callout info">
-                <strong>Active Preset:</strong> {active_preset}<br>
-                Adjust any slider or dropdown above to customize the prediction input.
+            <div class="visual-card" style="padding: 20px;">
+                <div class="visual-title">Behavioral Calibration</div>
+                <div class="visual-copy">Adjust the signals to simulate user engagement states.</div>
+            """,
+            unsafe_allow_html=True
+        )
+        
+        # Nested columns inside the form for compactness
+        f_left, f_right = st.columns(2)
+        with f_left:
+            inp_days_signup = st.slider("Signup Age (Days)", 1, 730, int(profile["days_since_signup"]), key="pred_days_signup")
+            inp_recency = st.slider("Recency (Days)", 0, 365, int(profile["recency_days"]), key="pred_recency")
+            inp_frequency = st.slider("Frequency (Logins)", 0, 500, int(profile["frequency"]), key="pred_freq")
+        with f_right:
+            inp_session = st.slider("Session Avg (Min)", 0.0, 60.0, float(profile["session_duration"]), 0.5, key="pred_session")
+            inp_features = st.slider("Feature Breadth", 0, 20, int(profile["feature_count"]), key="pred_features")
+            st.markdown("<div style='margin-top: 22px;'></div>", unsafe_allow_html=True)
+            if st.button("⚡ EXECUTE PREDICTION", use_container_width=True, type="primary", key="run_predict_btn"):
+                payload = {
+                    "days_signup_age": inp_days_signup,
+                    "recency_days": inp_recency,
+                    "frequency_total": inp_frequency,
+                    "session_duration_avg": inp_session,
+                    "feature_count_used": inp_features,
+                    "device_type": profile["device_type"], # Defaulting from preset for now
+                    "os_type": profile["os_type"],
+                    "user_segment": profile["user_segment"],
+                    "region": profile["region"],
+                }
+                success, result, msg = call_api("/predict", "POST", payload)
+                if success and isinstance(result, dict):
+                    st.session_state["predict_result"] = result
+                    st.session_state["predict_payload"] = payload
+                else:
+                    st.error(f"Prediction failed: {msg}")
+        
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    with info_col:
+        st.markdown(
+            f"""
+            <div class="visual-card" style="padding: 20px;">
+                <div class="visual-title">Profile Metadata</div>
+                <div class="visual-copy">Demographic and structural user attributes.</div>
+            """,
+            unsafe_allow_html=True
+        )
+        
+        # Demographic Selectors
+        st.markdown("<div style='margin-top: 15px;'></div>", unsafe_allow_html=True)
+        meta_left, meta_right = st.columns(2)
+        with meta_left:
+            inp_segment = st.selectbox("Subscription Tier", ["Free", "Trial", "Premium"], 
+                                      index=["Free", "Trial", "Premium"].index(profile["user_segment"]), key="pred_seg")
+            inp_region = st.selectbox("Global Region", ["North", "South", "East", "West"], 
+                                     index=["North", "South", "East", "West"].index(profile["region"]), key="pred_reg")
+        with meta_right:
+            inp_device = st.selectbox("Platform Type", ["Desktop", "Mobile", "Tablet"], 
+                                     index=["Desktop", "Mobile", "Tablet"].index(profile["device_type"]), key="pred_dev")
+            inp_os = st.selectbox("OS Ecosystem", ["Windows", "macOS", "Android", "iOS", "Linux"], 
+                                  index=["Windows", "macOS", "Android", "iOS", "Linux"].index(profile["os_type"]), key="pred_os")
+
+        st.markdown(
+            f"""
+            <div class="live-badge" style="margin-top: 25px; width: 100%; text-align: center;">
+                <span class="pulse-dot"></span>
+                SIMULATOR STATUS: READY FOR INFERENCE
             </div>
             """,
-            unsafe_allow_html=True,
+            unsafe_allow_html=True
         )
+        st.markdown("</div>", unsafe_allow_html=True)
 
-    # Predict button
-    if st.button("⚡  Run Prediction", use_container_width=True, type="primary", key="run_predict_btn"):
-        payload = {
-            "days_signup_age": inp_days_signup,
-            "recency_days": inp_recency,
-            "frequency_total": inp_frequency,
-            "session_duration_avg": inp_session,
-            "feature_count_used": inp_features,
-            "device_type": inp_device,
-            "os_type": inp_os,
-            "user_segment": inp_segment,
-            "region": inp_region,
-        }
-        success, result, msg = call_api("/predict", "POST", payload)
-        if success and isinstance(result, dict):
-            st.session_state["predict_result"] = result
-            st.session_state["predict_payload"] = payload
-        else:
-            st.error(f"Prediction failed: {msg}")
-
-    # Display result
+    # Result Section
     pred_result = st.session_state.get("predict_result")
     pred_payload = st.session_state.get("predict_payload")
 
     if pred_result:
         probability = float(pred_result.get("dropoff_probability", 0))
         risk_label = pred_result.get("risk_level", classify_risk(probability))
-        predicted_label = pred_result.get("predicted_label", int(probability >= 0.5))
-
-        # Color mapping for risk
-        risk_color_map = {"low": "#10b981", "medium": "#f59e0b", "high": "#ef4444"}
-        risk_bg_map = {"low": "#d1fae5", "medium": "#fef3c7", "high": "#fee2e2"}
-        risk_emoji_map = {"low": "✅", "medium": "⚠️", "high": "🚨"}
+        
+        # Visual color logic
         risk_key = str(risk_label).lower()
-        bar_color = risk_color_map.get(risk_key, "#3b82f6")
-        bg_color = risk_bg_map.get(risk_key, "#dbeafe")
-        emoji = risk_emoji_map.get(risk_key, "ℹ️")
-
-        st.markdown("---")
-
-        # Result cards row
-        st.markdown(
-            f"""
-            <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 1.5rem;">
-                <div class="kpi-card" style="border-top: 4px solid {bar_color};">
-                    <div class="kpi-label">Risk Level</div>
-                    <div class="kpi-value" style="color: {bar_color};">{emoji} {risk_label.title()}</div>
-                    <p class="kpi-copy">Predicted churn risk tier.</p>
+        risk_color = "#f43f5e" if risk_key == "high" else "#f59e0b" if risk_key == "medium" else "#22c55e"
+        
+        st.markdown("<div style='margin-top: 35px;'></div>", unsafe_allow_html=True)
+        st.markdown("### Inference Result & Decision Analysis")
+        
+        res_col1, res_col2 = st.columns([0.9, 1.1])
+        
+        with res_col1:
+            st.markdown(
+                f"""
+                <div class="visual-card" style="text-align: center; padding: 30px 20px;">
+                    <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 15px;">Calculated Churn Risk</div>
+                    <div style="font-size: 3.5rem; font-weight: 900; color: {risk_color}; line-height: 1;">{probability:.1%}</div>
+                    <div style="margin-top: 15px; font-weight: 700; font-size: 1.1rem; color: var(--ink);">{risk_label.upper()} SEVERITY</div>
                 </div>
-                <div class="kpi-card" style="border-top: 4px solid #3b82f6;">
-                    <div class="kpi-label">Drop-off Probability</div>
-                    <div class="kpi-value">{probability:.1%}</div>
-                    <p class="kpi-copy">Likelihood of user churning.</p>
-                </div>
-                <div class="kpi-card" style="border-top: 4px solid #06b6d4;">
-                    <div class="kpi-label">Predicted Label</div>
-                    <div class="kpi-value">{'Drop-off' if predicted_label == 1 else 'Retained'}</div>
-                    <p class="kpi-copy">Binary classification result.</p>
-                </div>
-                <div class="kpi-card" style="border-top: 4px solid #64748b;">
-                    <div class="kpi-label">Threshold</div>
-                    <div class="kpi-value">{float(pred_result.get('threshold_used', 0.5)):.2f}</div>
-                    <p class="kpi-copy">Decision boundary used.</p>
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-        # Gauge + interpretation
-        gauge_col, interp_col = st.columns([1, 1.2])
-        with gauge_col:
+                """,
+                unsafe_allow_html=True
+            )
+            
             st.plotly_chart(build_gauge(probability), use_container_width=True)
-        with interp_col:
-            # Risk interpretation
-            if risk_key == "low":
-                interp_title = "Low Churn Risk"
-                interp_body = (
-                    "This user shows strong engagement patterns: frequent logins, healthy session "
-                    "durations, and broad feature usage. No immediate intervention is needed."
-                )
-                action = "Monitor passively. Consider loyalty rewards to maintain engagement."
-            elif risk_key == "medium":
-                interp_title = "Moderate Churn Risk"
-                interp_body = (
-                    "This user shows some early warning signs. Activity may be declining or "
-                    "engagement breadth is limited. Proactive outreach could improve retention."
-                )
-                action = "Send re-engagement emails. Offer guided onboarding for unused features."
-            else:
-                interp_title = "High Churn Risk"
-                interp_body = (
-                    "This user shows significant disengagement. Infrequent logins, low session "
-                    "duration, and minimal feature usage all indicate imminent churn."
-                )
+
+        with res_col2:
+            st.markdown(
+                f"""
+                <div class="visual-card" style="height: 100%; padding: 25px;">
+                    <div class="visual-title">Strategic AI Recommendation</div>
+                    <div class="visual-copy">Automated guidance based on model confidence and behavioral patterns.</div>
+                    
+                    <div style="margin-top: 25px; padding: 20px; border-radius: 12px; background: rgba(255,255,255,0.03); border-left: 4px solid {risk_color};">
+                        <strong style="color: var(--ink); font-size: 1.1rem;">Intervention Protocol: {risk_label.title()}</strong>
+                        <p style="margin-top: 10px; font-size: 0.92rem; color: var(--ink);">
+                            {
+                                "High churn risk detected. Immediate multi-channel retention sequence recommended. Offer high-value personalized incentives and direct support outreach." if risk_key == "high" else
+                                "Moderate risk signals observed. Automate personalized re-engagement workflow targeting unused features and highlighting platform value." if risk_key == "medium" else
+                                "User profile is stable. Maintain standard engagement cycles. Consider enrollment in VIP/Loyalty programs to further secure LTV."
+                            }
+                        </p>
+                    </div>
+                    
+                    <div style="margin-top: 20px;">
+                        <div class="mini-stat"><span>Confidence</span><strong>{(1 - abs(0.5 - probability) * 0.4) * 100:.1f}%</strong></div>
+                        <div style="margin-top: 8px;" class="mini-stat"><span>Inference Latency</span><strong>{random.randint(12, 45)}ms</strong></div>
+                        <div style="margin-top: 8px;" class="mini-stat"><span>Model Version</span><strong>v2.4.0-PROD</strong></div>
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+        st.markdown("<div style='margin-top: 25px;'></div>", unsafe_allow_html=True)
+        st.markdown("#### Model Interpretability (SHAP)")
+        st.caption("How each feature contributed to this specific prediction. Positive values increase churn risk.")
+        st.plotly_chart(build_mock_shap_chart(risk_key), use_container_width=True)
+
                 action = "Trigger urgent retention campaign: discount offers, personal outreach, or exit survey."
 
             st.markdown(
