@@ -1654,9 +1654,13 @@ def chart_layout(fig: go.Figure, height: int = 330) -> go.Figure:
         height=height,
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
-        margin=dict(l=10, r=10, t=28, b=10),
+        margin=dict(l=10, r=10, t=50, b=10),
         font=dict(family="Inter, Arial", color="#c0c4d6"),
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="left", x=0, font=dict(color="#9ca0b8")),
+        legend=dict(
+            orientation="h", yanchor="bottom", y=1.08, xanchor="left", x=0,
+            font=dict(color="#9ca0b8", size=11),
+        ),
+        title=dict(font=dict(size=14, color="#e0e0ef"), x=0, xanchor="left", y=0.98, yanchor="top"),
         template="plotly_dark",
         colorway=["#818cf8", "#06b6d4", "#22c55e", "#f59e0b", "#f43f5e"],
         hoverlabel=dict(bgcolor="#1a1a2e", bordercolor="rgba(255,255,255,0.1)", font=dict(color="#f0f0f5")),
@@ -2556,7 +2560,8 @@ elif page == "Model Intelligence":
             )
         )
         fig.update_layout(barmode="group", yaxis_tickformat=".0%", yaxis_range=[0, 1.05])
-        st.plotly_chart(chart_layout(fig, 335), use_container_width=True)
+        st.markdown("#### Performance vs Target")
+        st.plotly_chart(chart_layout(fig, 340), use_container_width=True)
     with top_right:
         tn, fp = confusion[0]
         fn, tp = confusion[1]
@@ -2576,8 +2581,9 @@ elif page == "Model Intelligence":
             barmode="group",
             color_discrete_map={"Retained": "#818cf8", "Drop-off": "#f43f5e"},
         )
-        fig_cm.update_layout(title="Confusion matrix summary")
-        st.plotly_chart(chart_layout(fig_cm, 335), use_container_width=True)
+        fig_cm.update_layout(title="")
+        st.markdown("#### Confusion Matrix")
+        st.plotly_chart(chart_layout(fig_cm, 340), use_container_width=True)
 
     lower_left, lower_right = st.columns(2)
     with lower_left:
@@ -2597,12 +2603,13 @@ elif page == "Model Intelligence":
                 color="Metric",
                 markers=True,
                 color_discrete_map={"precision": "#818cf8", "recall": "#22c55e", "f1": "#f59e0b"},
-                title="Threshold comparison",
             )
             fig_threshold.update_layout(yaxis_tickformat=".0%")
+            st.markdown("#### Threshold Comparison")
             st.plotly_chart(chart_layout(fig_threshold, 340), use_container_width=True)
 
     with lower_right:
+        st.markdown("#### Feature Importance")
         st.plotly_chart(build_feature_importance_chart(), use_container_width=True)
 
 
