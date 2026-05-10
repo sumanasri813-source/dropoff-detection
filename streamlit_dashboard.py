@@ -1850,8 +1850,6 @@ NAV_LABELS = {
     "Batch Scoring": "05  Batch Evaluation",
     "Advanced Analytics": "06  Feature Insights",
     "System Health": "07  System Review",
-    "AI Assistant": "08  AI Insights",
-    "Admin Control": "09  Admin Panel",
 }
 
 if "page" not in st.session_state:
@@ -2923,43 +2921,6 @@ elif page == "System Health":
         else:
             st.error(f"❌ Service unavailable: {msg}")
             st.info("Attempting to reconnect.")
-
-    # --- AI ASSISTANT PAGE ---
-    if selected_page == "AI Assistant":
-        st.markdown("## 🤖 AI Insights Assistant")
-        st.caption("Ask our AI about your model's predictions and user behavior patterns.")
-        
-        if "chat_history" not in st.session_state:
-            st.session_state.chat_history = []
-
-        for message in st.session_state.chat_history:
-            with st.chat_message(message["role"]):
-                st.markdown(message["content"])
-
-        if prompt := st.chat_input("How can I help you understand this prediction?"):
-            st.session_state.chat_history.append({"role": "user", "content": prompt})
-            with st.chat_message("user"):
-                st.markdown(prompt)
-
-            with st.chat_message("assistant"):
-                # Mock AI response logic (In production, connect to OpenAI/Gemini)
-                response = f"Based on our SHAP analysis, the user's high 'Recency' of {st.session_state.get('last_prediction_val', 'N/A')} days is the primary driver for this drop-off risk. I recommend a targeted re-engagement email."
-                st.markdown(response)
-                st.session_state.chat_history.append({"role": "assistant", "content": response})
-
-    # --- EXPORT UTILITY ---
-    st.sidebar.markdown("---")
-    if st.sidebar.button("📄 Generate PDF Report", use_container_width=True):
-        st.toast("Generating premium PDF report...")
-        time.sleep(1)
-        st.success("Report Ready!")
-        st.download_button(
-            label="⬇️ Download Analysis",
-            data="User ID: 10293\nPrediction: High Risk (87%)\nTop Factor: Session Duration",
-            file_name=f"dropoff_report_{datetime.now().strftime('%Y%m%d')}.txt",
-            mime="text/plain",
-            use_container_width=True
-        )
 
     with errors_col:
         st.markdown("### Observations")

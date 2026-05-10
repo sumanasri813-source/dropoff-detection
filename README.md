@@ -13,7 +13,7 @@
 
 <br>
 
-**🌐 [Live API](https://dropoff-detection.onrender.com) · 📊 [Swagger Docs](https://dropoff-detection.onrender.com/apidocs/) · 📈 [Prometheus Metrics](https://dropoff-detection.onrender.com/metrics) · 🖥️ [Dashboard](https://sumanasri813-source-dropoff-detection.streamlit.app)**
+**🌐 [Live API](https://dropoff-detection.onrender.com) · 📊 [Swagger Docs](https://dropoff-detection.onrender.com/apidocs/) · 📈 [Prometheus Metrics](https://dropoff-detection.onrender.com/metrics) · 🖥️ [Dashboard](https://dropoff-detection-yw9m4fokdymztwrdn5l3dm.streamlit.app)**
 
 </div>
 
@@ -120,7 +120,7 @@ user-dropoff-detection/
 | 📖 **Swagger Docs** | [/apidocs/](https://dropoff-detection.onrender.com/apidocs/) | ✅ Interactive |
 | 📊 **Prometheus Metrics** | [/metrics](https://dropoff-detection.onrender.com/metrics) | ✅ Scraping |
 | 🔐 **JWT Auth** | [/auth/login](https://dropoff-detection.onrender.com/auth/login) | ✅ Active |
-| 🖥️ **Dashboard** | [Streamlit Cloud](https://sumanasri813-source-dropoff-detection.streamlit.app) | ✅ Deployed |
+| 🖥️ **Dashboard** | [Streamlit Cloud](https://dropoff-detection-yw9m4fokdymztwrdn5l3dm.streamlit.app) | ✅ Deployed |
 | ⚙️ **CI/CD** | [GitHub Actions](https://github.com/sumanasri813-source/dropoff-detection/actions) | ✅ Passing |
 
 ---
