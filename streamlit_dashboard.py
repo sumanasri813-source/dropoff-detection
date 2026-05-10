@@ -2032,6 +2032,7 @@ if page == "Command Center":
     with signal_col:
         render_signal_panel(api_online, metrics_blob, confusion)
 
+    # Top Stats Row
     k1, k2, k3, k4 = st.columns(4)
     with k1:
         render_kpi("ROC-AUC", f"{metric_value(metrics_blob, 'roc_auc', 0.9731):.3f}", "Separation quality.", "blue")
@@ -2042,42 +2043,9 @@ if page == "Command Center":
     with k4:
         render_kpi("Flagged", f"{int(confusion[1][1]):,}", "Users found.", "rose")
 
-    st.markdown(
-        """
-        <div class="panel">
-            <div class="panel-title">Model Decision Drivers: Top Behavioral Signals</div>
-            <div class="panel-copy">Quantifying the impact of specific user behaviors on churn probability. Red indicates increased risk, green indicates higher retention probability.</div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-    st.plotly_chart(build_feature_importance_chart(), use_container_width=True)
+    st.markdown("<div style='margin-top: 25px;'></div>", unsafe_allow_html=True)
 
-
-    visual_left, visual_right = st.columns([1.1, 0.9])
-    with visual_left:
-        st.markdown(
-            """
-            <div class="visual-card">
-                <div class="visual-title">Retention Funnel</div>
-                <div class="visual-copy">How users move from activity into risk groupings.</div>
-            """,
-            unsafe_allow_html=True,
-        )
-        st.plotly_chart(build_retention_funnel(), use_container_width=True)
-        st.markdown("</div>", unsafe_allow_html=True)
-    with visual_right:
-        st.markdown(
-            """
-            <div class="visual-card">
-                <div class="visual-title">Risk By Segment</div>
-                <div class="visual-copy">Which groups are most relevant for retention review.</div>
-            """,
-            unsafe_allow_html=True,
-        )
-        st.plotly_chart(build_segment_risk_donut(), use_container_width=True)
-        st.markdown("</div>", unsafe_allow_html=True)
-
+    # Risk Data preparation
     live_df_full = load_live_prediction_frame(limit=1000)
     if not live_df_full.empty:
         risk_counts = live_df_full["risk_level"].value_counts(normalize=True) * 100
@@ -2087,28 +2055,79 @@ if page == "Command Center":
     else:
         l_pct, m_pct, h_pct = "0%", "0%", "0%"
 
-    st.markdown(
-        f"""
-        <div class="risk-board">
-            <div class="risk-card">
-                <span>Low Risk</span>
-                <strong>{l_pct}</strong>
-                <p>Healthy users with regular activity.</p>
+    # Main Analytics Grid
+    col_feat, col_dist = st.columns([1.1, 0.9])
+    
+    with col_feat:
+        st.markdown(
+            """
+            <div class="visual-card">
+                <div class="visual-title">Model Decision Drivers</div>
+                <div class="visual-copy">Quantifying behavioral signal impacts on churn risk.</div>
+            """,
+            unsafe_allow_html=True,
+        )
+        st.plotly_chart(chart_layout(build_feature_importance_chart(), 380), use_container_width=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    with col_dist:
+        st.markdown(
+            """
+            <div class="visual-card">
+                <div class="visual-title">Retention Risk Composition</div>
+                <div class="visual-copy">Segmented breakdown of user population health.</div>
+            """,
+            unsafe_allow_html=True,
+        )
+        
+        # Display the risk cards in a tighter vertical layout
+        st.markdown(
+            f"""
+            <div style="display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 15px; margin-bottom: 15px;">
+                <div class="risk-card" style="padding: 14px 20px; margin: 0; display: flex; justify-content: space-between; align-items: center;">
+                    <div><span style="font-size: 0.7rem; color: var(--muted); text-transform: uppercase; font-weight: 800;">Low Risk</span><p style="margin:0; font-size: 0.8rem;">Healthy regular users</p></div>
+                    <strong style="font-size: 1.6rem; color: var(--ink);">{l_pct}</strong>
+                </div>
+                <div class="risk-card medium" style="padding: 14px 20px; margin: 0; display: flex; justify-content: space-between; align-items: center;">
+                    <div><span style="font-size: 0.7rem; color: var(--muted); text-transform: uppercase; font-weight: 800;">Medium Risk</span><p style="margin:0; font-size: 0.8rem;">Needs product guidance</p></div>
+                    <strong style="font-size: 1.6rem; color: var(--ink);">{m_pct}</strong>
+                </div>
+                <div class="risk-card high" style="padding: 14px 20px; margin: 0; display: flex; justify-content: space-between; align-items: center;">
+                    <div><span style="font-size: 0.7rem; color: var(--muted); text-transform: uppercase; font-weight: 800;">High Risk</span><p style="margin:0; font-size: 0.8rem;">Priority retention action</p></div>
+                    <strong style="font-size: 1.6rem; color: var(--ink);">{h_pct}</strong>
+                </div>
             </div>
-            <div class="risk-card medium">
-                <span>Medium Risk</span>
-                <strong>{m_pct}</strong>
-                <p>Need nudges and product guidance.</p>
-            </div>
-            <div class="risk-card high">
-                <span>High Risk</span>
-                <strong>{h_pct}</strong>
-                <p>Priority users for retention action.</p>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+            """,
+            unsafe_allow_html=True
+        )
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    # Lower Visuals Row
+    visual_left, visual_right = st.columns([1, 1])
+    with visual_left:
+        st.markdown(
+            """
+            <div class="visual-card">
+                <div class="visual-title">Retention Funnel Analysis</div>
+                <div class="visual-copy">Conversion of active users into retention groups.</div>
+            """,
+            unsafe_allow_html=True,
+        )
+        st.plotly_chart(build_retention_funnel(), use_container_width=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+        
+    with visual_right:
+        st.markdown(
+            """
+            <div class="visual-card">
+                <div class="visual-title">Segment Behavioral Risk</div>
+                <div class="visual-copy">Risk concentration across user categories.</div>
+            """,
+            unsafe_allow_html=True,
+        )
+        st.plotly_chart(build_segment_risk_donut(), use_container_width=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+
 
 
 
